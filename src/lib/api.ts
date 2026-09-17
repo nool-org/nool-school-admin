@@ -29,7 +29,6 @@ import type {
   GradeSubjects,
   SchoolGrade,
   SchoolHomework,
-  SchoolImprovement,
   Chapter,
   CreateCustomQuestionInput,
   CustomQuestion,
@@ -41,7 +40,6 @@ import type {
   UpdateCustomQuestionInput,
   SchoolQuestionBankEntry,
   SchoolQuestionPaper,
-  SchoolRetestProgress,
   SchoolStudent,
   SchoolSubscription,
   SchoolTeacher,
@@ -240,19 +238,6 @@ export const listSchoolQuestionPapers = (params: {
   offset: number;
 }): Promise<PageEnvelope<SchoolQuestionPaper>> =>
   apiRequest(`/school/question-papers${toQuery(params)}`);
-
-export const listSchoolRetestProgress = (params: {
-  classId?: string;
-  limit: number;
-  offset: number;
-}): Promise<PageEnvelope<SchoolRetestProgress>> =>
-  apiRequest(`/school/retest-progress${toQuery(params)}`);
-
-export const listSchoolImprovement = (params: {
-  classId?: string;
-  limit: number;
-  offset: number;
-}): Promise<PageEnvelope<SchoolImprovement>> => apiRequest(`/school/improvement${toQuery(params)}`);
 
 export const getSchoolLeaderboard = (params: {
   classId?: string;

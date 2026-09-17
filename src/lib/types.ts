@@ -209,6 +209,8 @@ export interface SchoolDataset {
   questionCount: number;
   description: string;
   enabled: boolean;
+  /** A school-exclusive dataset (e.g. a bank meant only for this school) — not part of the shared default catalog. */
+  restricted: boolean;
 }
 
 /** One row per named question-bank set this school has used (plus one
@@ -289,27 +291,6 @@ export interface SchoolQuestionPaper {
   createdAt: string;
 }
 
-export interface SchoolRetestProgress {
-  homeworkId: string;
-  classLabel: string;
-  gapTopic: string;
-  assignedCount: number;
-  completedCount: number;
-  inProgressCount: number;
-  notStartedCount: number;
-}
-
-export interface SchoolImprovement {
-  testId: string;
-  homeworkId: string;
-  classLabel: string;
-  gapTopic: string;
-  baselinePercent: number;
-  retestPercent: number;
-  improvementPercent: number;
-  assignedCount: number;
-  retestedCount: number;
-}
 
 export interface SchoolLeaderboardEntry {
   studentId: string;

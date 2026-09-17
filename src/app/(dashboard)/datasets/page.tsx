@@ -40,6 +40,20 @@ export default function DatasetsPage() {
     { field: 'questionCount', headerName: 'Questions', width: 120 },
     { field: 'description', headerName: 'Description', flex: 2, minWidth: 280 },
     {
+      field: 'restricted',
+      headerName: 'Availability',
+      width: 130,
+      sortable: false,
+      renderCell: (params) =>
+        params.row.restricted ? (
+          <span className="tag yellow">Restricted</span>
+        ) : (
+          <span className="tag" style={{ color: 'var(--color-muted)' }}>
+            Shared catalog
+          </span>
+        ),
+    },
+    {
       field: 'enabled',
       headerName: 'Active',
       width: 110,

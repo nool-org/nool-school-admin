@@ -59,7 +59,7 @@ export function useUrlParam(key: string, defaultValue: string): [string, (next: 
 
 /** Same idea as useUrlParam, specialized for a DataGrid `paginationModel` -
  * reads/writes `${prefix}page`/`${prefix}pageSize` so a page with more than
- * one grid (e.g. Retests & Improvement) can give each its own pair of
+ * one grid (e.g. the Question bank page) can give each its own pair of
  * params instead of colliding. */
 export function useUrlPaginationModel(
   defaultPageSize: number,

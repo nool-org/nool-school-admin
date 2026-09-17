@@ -113,9 +113,6 @@ export default function AnalyticsPage() {
                 <Link href="/question-bank" className="link-btn" style={{ padding: '10px 0' }}>
                   Browse the school question bank →
                 </Link>
-                <Link href="/activity/retests" className="link-btn" style={{ padding: '10px 0' }}>
-                  Retests &amp; improvement →
-                </Link>
               </div>
             </div>
           </div>

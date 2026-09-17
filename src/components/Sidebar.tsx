@@ -118,12 +118,6 @@ const ICONS: Record<string, React.ReactNode> = {
       <circle cx="8.5" cy="16" r="0.6" fill="currentColor" />
     </Icon>
   ),
-  retests: (
-    <Icon>
-      <path d="M4 12a8 8 0 1 1 2.7 6" />
-      <path d="M4 20v-5h5" />
-    </Icon>
-  ),
   leaderboard: (
     <Icon>
       <path d="M8 20V10M14 20V4M20 20v-7M2 20h20" />
@@ -203,7 +197,6 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
       { href: '/activity/tests', label: 'Voice Tests', icon: 'tests', feature: 'voice_test' },
       { href: '/activity/homework', label: 'Homework', icon: 'homework', feature: 'homework' },
       { href: '/activity/question-papers', label: 'Question Papers', icon: 'question-papers', feature: 'question_paper' },
-      { href: '/activity/retests', label: 'Retests & Improvement', icon: 'retests', feature: 'improvement_analysis' },
       { href: '/activity/leaderboard', label: 'Leaderboard', icon: 'leaderboard', feature: 'leaderboard' },
       { href: '/activity/audit-log', label: 'Activity log', icon: 'audit-log' },
     ],
