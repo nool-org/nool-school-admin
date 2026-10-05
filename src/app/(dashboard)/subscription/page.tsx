@@ -88,7 +88,7 @@ export default function SubscriptionPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading subscription" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' ? (
         <>

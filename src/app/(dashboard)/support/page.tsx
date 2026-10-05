@@ -158,7 +158,7 @@ export default function SupportPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading tickets" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.length === 0 ? (
         <EmptyState

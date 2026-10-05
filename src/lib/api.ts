@@ -2,7 +2,6 @@ import { apiDownload, apiRequest, apiRequestList, apiUpload } from './apiClient'
 import type {
   BloomDistribution,
   BloomDistributionResult,
-  BloomLevel,
   BulkImportResult,
   ClassAssignment,
   CreateClassInput,
@@ -10,7 +9,6 @@ import type {
   CreateReportConfigurationInput,
   CreateStudentInput,
   CreateStudentResult,
-  CustomQuestionCollectionSummary,
   DimensionSpec,
   InviteTeacherInput,
   InviteTeacherResult,
@@ -29,19 +27,22 @@ import type {
   GradeSubjects,
   SchoolGrade,
   SchoolHomework,
-  SchoolImprovement,
   Chapter,
-  CreateCustomQuestionInput,
-  CustomQuestion,
-  QuestionType,
+  CreateSchoolDatasetInput,
+  DatasetQuestion,
+  DatasetQuestionInput,
+  Difficulty,
+  BloomLevel,
+  QuestionImportResult,
+  Subtopic,
+  UpdateDatasetQuestionInput,
+  UpdateSchoolDatasetInput,
   SchoolLeaderboardEntry,
   SchoolLogoResult,
   Subject,
   Topic,
-  UpdateCustomQuestionInput,
   SchoolQuestionBankEntry,
   SchoolQuestionPaper,
-  SchoolRetestProgress,
   SchoolStudent,
   SchoolSubscription,
   SchoolTeacher,
@@ -160,11 +161,10 @@ export const updateGradeStatus = (gradeId: string, status: UserStatus): Promise<
 export const deleteGrade = (gradeId: string): Promise<void> =>
   apiRequest(`/school/grades/${gradeId}`, { method: 'DELETE' });
 
+// Read-only - assigning subjects to a Class is exclusively Super Admin/
+// PM's job now; PUT /school/grades/{id}/subjects no longer exists.
 export const getGradeSubjects = (gradeId: string): Promise<GradeSubjects> =>
   apiRequest(`/school/grades/${gradeId}/subjects`);
-
-export const updateGradeSubjects = (gradeId: string, subjectIds: string[]): Promise<GradeSubjects> =>
-  apiRequest(`/school/grades/${gradeId}/subjects`, { method: 'PUT', body: { subjectIds } });
 
 // Curriculum
 // Read-only for School Admin - assignment is exclusively Super Admin's
@@ -172,12 +172,49 @@ export const updateGradeSubjects = (gradeId: string, subjectIds: string[]): Prom
 // docstring; PUT /school/curriculum no longer exists).
 export const getCurriculum = (): Promise<SchoolCurriculum> => apiRequest('/school/curriculum');
 
-// Datasets - enable/disable only; creation and editing are Super-Admin-only
-// (global catalog), see spec/docs for why.
+// Datasets - assigned catalog datasets (owned=false) are read-only here;
+// only Super Admin assigns them (PUT /school/datasets no longer exists).
+// The school's own question banks (owned=true) are fully managed here.
 export const listDatasets = (): Promise<SchoolDataset[]> => apiRequestList('/school/datasets');
 
-export const updateDatasets = (datasetIds: string[]): Promise<SchoolDataset[]> =>
-  apiRequestList('/school/datasets', { method: 'PUT', body: { datasetIds } });
+export const createDataset = (input: CreateSchoolDatasetInput): Promise<SchoolDataset> =>
+  apiRequest('/school/datasets', { method: 'POST', body: input });
+
+export const updateDataset = (datasetId: string, input: UpdateSchoolDatasetInput): Promise<SchoolDataset> =>
+  apiRequest(`/school/datasets/${datasetId}`, { method: 'PATCH', body: input });
+
+/** 409 (with a readable message) when the bank is used by homework or a question paper. */
+export const deleteDataset = (datasetId: string): Promise<void> =>
+  apiRequest(`/school/datasets/${datasetId}`, { method: 'DELETE' });
+
+export const listDatasetQuestions = (
+  datasetId: string,
+  params: {
+    chapterId?: string;
+    topicId?: string;
+    subtopicId?: string;
+    bloomLevel?: BloomLevel;
+    difficulty?: Difficulty;
+    limit: number;
+    offset: number;
+  },
+): Promise<PageEnvelope<DatasetQuestion>> => apiRequest(`/school/datasets/${datasetId}/questions${toQuery(params)}`);
+
+export const createDatasetQuestion = (datasetId: string, input: DatasetQuestionInput): Promise<DatasetQuestion> =>
+  apiRequest(`/school/datasets/${datasetId}/questions`, { method: 'POST', body: input });
+
+export const updateDatasetQuestion = (
+  datasetId: string,
+  questionId: string,
+  input: UpdateDatasetQuestionInput,
+): Promise<DatasetQuestion> =>
+  apiRequest(`/school/datasets/${datasetId}/questions/${questionId}`, { method: 'PATCH', body: input });
+
+export const deleteDatasetQuestion = (datasetId: string, questionId: string): Promise<void> =>
+  apiRequest(`/school/datasets/${datasetId}/questions/${questionId}`, { method: 'DELETE' });
+
+export const bulkImportDatasetQuestions = (datasetId: string, file: File): Promise<QuestionImportResult> =>
+  apiUpload(`/school/datasets/${datasetId}/questions/bulk-import`, file);
 
 // Analytics + subscription (read-only, except the upgrade request below)
 export const getAnalytics = (): Promise<SchoolAnalytics> => apiRequest('/school/analytics');
@@ -241,19 +278,6 @@ export const listSchoolQuestionPapers = (params: {
 }): Promise<PageEnvelope<SchoolQuestionPaper>> =>
   apiRequest(`/school/question-papers${toQuery(params)}`);
 
-export const listSchoolRetestProgress = (params: {
-  classId?: string;
-  limit: number;
-  offset: number;
-}): Promise<PageEnvelope<SchoolRetestProgress>> =>
-  apiRequest(`/school/retest-progress${toQuery(params)}`);
-
-export const listSchoolImprovement = (params: {
-  classId?: string;
-  limit: number;
-  offset: number;
-}): Promise<PageEnvelope<SchoolImprovement>> => apiRequest(`/school/improvement${toQuery(params)}`);
-
 export const getSchoolLeaderboard = (params: {
   classId?: string;
   limit: number;
@@ -265,56 +289,25 @@ export const listSchoolQuestionBank = (params: {
   topic?: string;
   collectionName?: string;
   generalBankOnly?: boolean;
+  /** Only CUSTOM rows of this own bank. */
+  datasetId?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolQuestionBankEntry>> => apiRequest(`/school/question-bank${toQuery(params)}`);
 
-// Global curriculum catalog (read-only) - for building the Subject ->
-// Chapter -> Topic cascade in the "Add custom question" form.
-export const listSubjects = (): Promise<Subject[]> => apiRequestList('/subjects');
+// Global curriculum catalog (read-only) - for building the Chapter ->
+// Topic -> Subtopic cascade in the question-bank question form.
+/** Only subjects the Super Admin enabled for this school (optionally of one grade). */
+export const listSubjects = (grade?: number): Promise<Subject[]> => apiRequestList(`/subjects${toQuery({ grade })}`);
 
-export const listChapters = (subjectId: string): Promise<Chapter[]> =>
-  apiRequestList(`/subjects/${subjectId}/chapters`);
+export const listChapters = (subjectId: string, grade?: number): Promise<Chapter[]> =>
+  apiRequestList(`/subjects/${subjectId}/chapters${toQuery({ grade })}`);
 
 export const listTopics = (chapterId: string): Promise<Topic[]> =>
   apiRequestList(`/chapters/${chapterId}/topics`);
 
-// Custom questions
-export const listCustomQuestions = (params: {
-  classId?: string;
-  subjectId?: string;
-  chapterId?: string;
-  topicId?: string;
-  bloomLevel?: BloomLevel;
-  questionType?: QuestionType;
-  collectionName?: string;
-  generalBankOnly?: boolean;
-  limit: number;
-  offset: number;
-}): Promise<PageEnvelope<CustomQuestion>> => apiRequest(`/school/custom-questions${toQuery(params)}`);
-
-export const getCustomQuestion = (questionId: string): Promise<CustomQuestion> =>
-  apiRequest(`/school/custom-questions/${questionId}`);
-
-export const createCustomQuestion = (input: CreateCustomQuestionInput): Promise<CustomQuestion> =>
-  apiRequest('/school/custom-questions', { method: 'POST', body: input });
-
-export const updateCustomQuestion = (
-  questionId: string,
-  input: UpdateCustomQuestionInput,
-): Promise<CustomQuestion> => apiRequest(`/school/custom-questions/${questionId}`, { method: 'PATCH', body: input });
-
-export const deleteCustomQuestion = (questionId: string): Promise<void> =>
-  apiRequest(`/school/custom-questions/${questionId}`, { method: 'DELETE' });
-
-export const bulkImportCustomQuestions = (file: File): Promise<BulkImportResult> =>
-  apiUpload('/school/custom-questions/bulk-import', file);
-
-export const listCustomQuestionCollections = (): Promise<string[]> =>
-  apiRequest('/school/custom-questions/collections');
-
-export const getCustomQuestionCollectionsSummary = (): Promise<CustomQuestionCollectionSummary[]> =>
-  apiRequest('/school/custom-questions/collections/summary');
+export const listSubtopics = (topicId: string): Promise<Subtopic[]> =>
+  apiRequestList(`/topics/${topicId}/subtopics`);
 
 export const listSchoolAuditLog = (params: {
   limit: number;

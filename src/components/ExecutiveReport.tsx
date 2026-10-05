@@ -104,6 +104,9 @@ export function ExecutiveReport() {
   if (anyError) {
     return (
       <ErrorState
+        error={
+          [analyticsState, subscriptionState, leaderboardState, teachersState, studentsState, classesState].map((st) => (st.status === 'error' ? st.error : null)).find(Boolean)
+        }
         onRetry={() => {
           if (analyticsState.status === 'error') analyticsState.retry();
           if (subscriptionState.status === 'error') subscriptionState.retry();

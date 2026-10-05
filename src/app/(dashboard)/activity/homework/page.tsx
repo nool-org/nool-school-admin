@@ -87,7 +87,7 @@ export default function SchoolHomeworkPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading homework" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.items.length === 0 ? (
         <EmptyState title="No Homework yet" message="Homework assigned by teachers across the school will show up here." />

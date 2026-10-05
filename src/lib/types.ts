@@ -179,6 +179,8 @@ export interface SubjectToggle {
   id: string;
   name: string;
   enabled: boolean;
+  /** null = legacy subject not tied to one grade. */
+  grade: number | null;
 }
 
 /** The generated credential email is drafted client-side (subject/body
@@ -199,25 +201,39 @@ export interface SchoolCurriculum {
   subjects: SubjectToggle[];
 }
 
-/** A dataset as scoped to this school - `enabled` is this school's own
- * toggle (school_datasets), separate from the global catalog Super Admin
- * manages. Creation/editing stays Super-Admin-only; this app only toggles
- * availability. */
+/** A dataset visible to this school - either a catalog dataset a Super
+ * Admin assigned (owned=false, read-only here) or one of the school's own
+ * question banks (owned=true, scoped to one subject + grade). */
 export interface SchoolDataset {
   id: string;
   name: string;
   questionCount: number;
   description: string;
   enabled: boolean;
+  restricted: boolean;
+  owned: boolean;
+  /** False when the dataset's subject is disabled for the school - then it's
+   * unusable (hidden from teachers, homework and papers) until re-enabled. */
+  subjectEnabled?: boolean;
+  subjectId: string | null;
+  subjectName: string | null;
+  grade: number | null;
 }
 
-/** One row per named question-bank set this school has used (plus one
- * synthetic row for the general bank, collectionName=null) - this
- * school's own, locally-owned content, shown alongside the global
- * (Super-Admin-owned) Dataset catalog on the Datasets page. */
-export interface CustomQuestionCollectionSummary {
-  collectionName: string | null;
-  questionCount: number;
+/** Name of the bank migrated custom questions without a collection landed
+ * in - the merged question bank reports it as collectionName=null. */
+export const GENERAL_BANK_NAME = 'General bank';
+
+export interface CreateSchoolDatasetInput {
+  name: string;
+  description?: string;
+  subjectId: string;
+  grade: number;
+}
+
+export interface UpdateSchoolDatasetInput {
+  name?: string;
+  description?: string;
 }
 
 export interface BloomScore {
@@ -289,28 +305,6 @@ export interface SchoolQuestionPaper {
   createdAt: string;
 }
 
-export interface SchoolRetestProgress {
-  homeworkId: string;
-  classLabel: string;
-  gapTopic: string;
-  assignedCount: number;
-  completedCount: number;
-  inProgressCount: number;
-  notStartedCount: number;
-}
-
-export interface SchoolImprovement {
-  testId: string;
-  homeworkId: string;
-  classLabel: string;
-  gapTopic: string;
-  baselinePercent: number;
-  retestPercent: number;
-  improvementPercent: number;
-  assignedCount: number;
-  retestedCount: number;
-}
-
 export interface SchoolLeaderboardEntry {
   studentId: string;
   displayName: string;
@@ -324,7 +318,8 @@ export type QuestionBankSource = 'QUESTION_PAPER' | 'HOMEWORK' | 'CUSTOM';
 /** One previously-generated question, aggregated at read time from
  * wherever it was actually generated (a Question Paper or a Homework
  * set) - see nool-core's list_school_question_bank. A CUSTOM row is the
- * one source that isn't generated - see CustomQuestion below. */
+ * one source that isn't generated - it comes from one of the school's own
+ * question banks (see SchoolDataset). */
 export interface SchoolQuestionBankEntry {
   id: string;
   text: string;
@@ -335,8 +330,10 @@ export interface SchoolQuestionBankEntry {
   source: QuestionBankSource;
   sourceName: string;
   createdAt: string | null;
-  /** CUSTOM rows only - null means the school's general question bank. */
+  /** CUSTOM rows only - the bank's name; null means the "General bank". */
   collectionName: string | null;
+  /** CUSTOM rows only: the school-owned bank the question is in. */
+  datasetId?: string | null;
 }
 
 // Global curriculum catalog (read-only here - Super Admin owns create/
@@ -344,6 +341,13 @@ export interface SchoolQuestionBankEntry {
 export interface Subject {
   id: string;
   name: string;
+  /** null = legacy subject not tied to one grade. */
+  grade: number | null;
+}
+
+/** Subjects are per grade and two may share a name - always label with the grade. */
+export function subjectLabel(subject: { name: string; grade?: number | null }): string {
+  return subject.grade == null ? subject.name : `${subject.name} · Grade ${subject.grade}`;
 }
 
 export interface Chapter {
@@ -358,8 +362,14 @@ export interface Topic {
   name: string;
 }
 
-// Custom questions - School Admin-authored content, following the full
-// curriculum hierarchy plus Class - see nool-core's CustomQuestion.
+export interface Subtopic {
+  id: string;
+  topicId: string;
+  name: string;
+}
+
+// Dataset questions - the questions inside a dataset (a school's own bank
+// or an assigned catalog dataset) - see nool-core's DatasetQuestion.
 export type QuestionType = 'MCQ' | 'SHORT_ANSWER' | 'LONG_ANSWER' | 'TRUE_FALSE';
 
 export const QUESTION_TYPES: readonly QuestionType[] = ['MCQ', 'SHORT_ANSWER', 'LONG_ANSWER', 'TRUE_FALSE'];
@@ -367,17 +377,25 @@ export const QUESTION_TYPES: readonly QuestionType[] = ['MCQ', 'SHORT_ANSWER', '
 /** Only MCQ and TRUE_FALSE carry fixed choices. */
 export const CHOICE_QUESTION_TYPES: readonly QuestionType[] = ['MCQ', 'TRUE_FALSE'];
 
-export interface CustomQuestion {
+export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+
+export const DIFFICULTIES: readonly Difficulty[] = ['EASY', 'MEDIUM', 'HARD'];
+
+export interface QuestionFigure {
+  blob: string;
+  role: string;
+  option: string | null;
+  caption: string | null;
+  kind: string | null;
+  url: string | null;
+}
+
+export interface DatasetQuestion {
   id: string;
-  // Exactly one of classId/grade is set. classId = one specific Section
-  // (a single grade+section, e.g. "Class 10 · A"). grade = the whole
-  // Class (every section in that grade at this school) - for content
-  // common across sections that shouldn't need duplicating per section.
-  classId: string | null;
-  grade: number | null;
-  subjectId: string;
-  chapterId: string;
+  datasetId: string;
+  chapterId: string | null;
   topicId: string | null;
+  subtopicId: string | null;
   bloomLevel: BloomLevel;
   questionType: QuestionType;
   text: string;
@@ -385,28 +403,43 @@ export interface CustomQuestion {
   answer: string;
   createdBy: string;
   createdAt: string;
-  /** Null = the school's general question bank (the default). A name
-   * groups this question under a custom-named set instead. */
-  collectionName: string | null;
+  figures: QuestionFigure[] | null;
+  solution: string | null;
+  marks: number | null;
+  format: string | null;
+  difficulty: Difficulty | null;
 }
 
-export interface CreateCustomQuestionInput {
-  // Exactly one of classId/grade - see CustomQuestion's docstring above.
-  classId?: string | null;
-  grade?: number | null;
-  subjectId: string;
-  chapterId: string;
+/** At least one of chapterId/topicId/subtopicId is required - a subtopic
+ * alone fills in its topic and chapter server-side. */
+export interface DatasetQuestionInput {
+  chapterId?: string | null;
   topicId?: string | null;
+  subtopicId?: string | null;
   bloomLevel: BloomLevel;
   questionType: QuestionType;
+  difficulty?: Difficulty | null;
+  marks?: number | null;
   text: string;
+  /** MCQ/TRUE_FALSE only (>= 2, answer must equal one) - null otherwise. */
   options?: string[] | null;
   answer: string;
-  /** Blank/omitted = the school's general question bank. */
-  collectionName?: string | null;
+  solution?: string | null;
 }
 
-export type UpdateCustomQuestionInput = Partial<CreateCustomQuestionInput>;
+export type UpdateDatasetQuestionInput = Partial<DatasetQuestionInput>;
+
+export interface QuestionImportRowResult {
+  row: number;
+  status: 'created' | 'error';
+  error: string | null;
+}
+
+export interface QuestionImportResult {
+  results: QuestionImportRowResult[];
+  createdCount: number;
+  errorCount: number;
+}
 
 export interface SchoolSubscription {
   schoolId: string;

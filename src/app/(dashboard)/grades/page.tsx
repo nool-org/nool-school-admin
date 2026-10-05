@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
-import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 import type { GridColDef } from '@mui/x-data-grid';
 
@@ -12,10 +11,10 @@ import { BanIcon, BookIcon, CheckCircleIcon, PlusIcon, TrashIcon } from '@/compo
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Modal } from '@/components/Modal';
 import { useToast } from '@/components/Toast';
-import { createGrade, deleteGrade, getGradeSubjects, listGrades, updateGradeStatus, updateGradeSubjects } from '@/lib/api';
+import { createGrade, deleteGrade, getGradeSubjects, listGrades, updateGradeStatus } from '@/lib/api';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
-import { MAX_GRADE, MIN_GRADE, type SchoolGrade, type SubjectToggle } from '@/lib/types';
+import { MAX_GRADE, MIN_GRADE, subjectLabel, type SchoolGrade, type SubjectToggle } from '@/lib/types';
 
 /** The "Class" level (e.g. "Class 10") - the parent every Section on the
  * Sections page belongs to. See SchoolGrade's doc comment in types.ts for
@@ -38,7 +37,8 @@ export default function GradesPage() {
   const [subjects, setSubjects] = useState<SubjectToggle[] | null>(null);
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [subjectsError, setSubjectsError] = useState<string | null>(null);
-  const [savingSubjectId, setSavingSubjectId] = useState<string | null>(null);
+  // Bumped by Retry - re-setting subjectsTarget to the same object is a no-op for the effect.
+  const [subjectsRetry, setSubjectsRetry] = useState(0);
 
   const grades = state.status === 'success' ? state.data : [];
 
@@ -50,7 +50,8 @@ export default function GradesPage() {
     setSubjectsError(null);
     getGradeSubjects(subjectsTarget.id)
       .then((result) => {
-        if (!cancelled) setSubjects(result.subjects);
+        // Contract: only the subjects enabled for this school in this Class's grade.
+        if (!cancelled) setSubjects(result.subjects.filter((s) => s.enabled));
       })
       .catch((cause) => {
         if (!cancelled) setSubjectsError(normalizeError(cause).message);
@@ -61,28 +62,12 @@ export default function GradesPage() {
     return () => {
       cancelled = true;
     };
-  }, [subjectsTarget]);
+  }, [subjectsTarget, subjectsRetry]);
 
   function closeSubjects() {
     setSubjectsTarget(null);
     setSubjects(null);
     setSubjectsError(null);
-  }
-
-  async function handleToggleSubject(subjectId: string, currentlyEnabled: boolean) {
-    if (!subjectsTarget || !subjects) return;
-    setSavingSubjectId(subjectId);
-    const nextEnabledIds = subjects
-      .filter((s) => (s.id === subjectId ? !currentlyEnabled : s.enabled))
-      .map((s) => s.id);
-    try {
-      const result = await updateGradeSubjects(subjectsTarget.id, nextEnabledIds);
-      setSubjects(result.subjects);
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setSavingSubjectId(null);
-    }
   }
 
   function validGrade(value: string): number | null {
@@ -203,7 +188,7 @@ export default function GradesPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading classes" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && grades.length === 0 ? (
         <EmptyState
@@ -245,28 +230,35 @@ export default function GradesPage() {
         </form>
       </Modal>
 
+      {/* Read-only - assigning subjects to a Class is exclusively Super
+          Admin/PM's job (the per-Class Subjects toggle on the platform's
+          Schools > Classes page). This modal used to let School Admin
+          toggle subjects on/off directly; that write path was removed on
+          the backend too (see nool-core's school_admin.py -
+          PUT /grades/{id}/subjects no longer exists), not just hidden here. */}
       <Modal
         open={subjectsTarget !== null}
         title={subjectsTarget ? `Subjects · Class ${subjectsTarget.grade}` : 'Subjects'}
         onClose={closeSubjects}
       >
+        <p style={{ color: 'var(--color-muted)', marginTop: 0 }}>
+          Which subjects this Class teaches - managed by your platform admin, not here. If one you
+          need isn&apos;t listed as assigned yet, ask them.
+        </p>
         {subjectsLoading ? <LoadingState label="Loading subjects" /> : null}
-        {subjectsError ? <ErrorState onRetry={() => setSubjectsTarget(subjectsTarget)} /> : null}
+        {subjectsError ? <ErrorState message={subjectsError} onRetry={() => setSubjectsRetry((n) => n + 1)} /> : null}
         {!subjectsLoading && !subjectsError && subjects ? (
           subjects.length === 0 ? (
             <p style={{ color: 'var(--color-muted)' }}>
-              No subjects in the catalog yet - ask your platform admin to add one.
+              No subjects assigned to this Class yet - ask your platform admin to add one.
             </p>
           ) : (
             subjects.map((subject) => (
               <div key={subject.id} className="checkrow">
-                <span>{subject.name}</span>
-                <Switch
-                  style={{ marginLeft: 'auto' }}
-                  checked={subject.enabled}
-                  disabled={savingSubjectId === subject.id}
-                  onChange={() => handleToggleSubject(subject.id, subject.enabled)}
-                />
+                <span>{subjectLabel(subject)}</span>
+                <span className="tag green" style={{ marginLeft: 'auto' }}>
+                  Assigned
+                </span>
               </div>
             ))
           )

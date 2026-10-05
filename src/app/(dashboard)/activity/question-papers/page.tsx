@@ -7,7 +7,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { getCurriculum, listSchoolQuestionPapers, listTeachers } from '@/lib/api';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
-import type { QuestionPaperStatus, SchoolQuestionPaper } from '@/lib/types';
+import { subjectLabel, type QuestionPaperStatus, type SchoolQuestionPaper } from '@/lib/types';
 
 const PAGE_SIZE = 20;
 
@@ -81,9 +81,13 @@ export default function SchoolQuestionPapersPage() {
           <option value="">All subjects</option>
           {subjects.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.name}
+              {subjectLabel(s)}
             </option>
           ))}
+          {/* A filter from a shared link / a since-disabled subject stays selectable instead of rendering blank. */}
+          {subjectFilter && curriculumState.status === 'success' && !subjects.some((s) => s.id === subjectFilter) ? (
+            <option value={subjectFilter}>Subject no longer assigned</option>
+          ) : null}
         </select>
         <select
           className="field"
@@ -104,7 +108,7 @@ export default function SchoolQuestionPapersPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading question papers" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.items.length === 0 ? (
         <EmptyState

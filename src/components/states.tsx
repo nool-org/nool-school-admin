@@ -12,17 +12,20 @@ export function LoadingState({ label }: { label: string }) {
 
 export function ErrorState({
   title = 'Something went wrong',
-  message = 'Please try again.',
+  message,
+  error,
   onRetry,
 }: {
   title?: string;
   message?: string;
+  /** The failure itself - its (server-provided) message is shown when no explicit `message` is given. */
+  error?: { message?: string } | null;
   onRetry?: () => void;
 }) {
   return (
     <div className="state-card error">
       <b>{title}</b>
-      <p>{message}</p>
+      <p>{message ?? (error?.message || 'Please try again.')}</p>
       {onRetry ? (
         <button type="button" className="btn dark sm" onClick={onRetry}>
           Retry

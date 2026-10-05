@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading analytics" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' ? (
         <>
@@ -112,9 +112,6 @@ export default function AnalyticsPage() {
                 </Link>
                 <Link href="/question-bank" className="link-btn" style={{ padding: '10px 0' }}>
                   Browse the school question bank →
-                </Link>
-                <Link href="/activity/retests" className="link-btn" style={{ padding: '10px 0' }}>
-                  Retests &amp; improvement →
                 </Link>
               </div>
             </div>

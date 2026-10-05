@@ -87,8 +87,8 @@ export default function DashboardPage() {
     curriculumState.status === 'success' && curriculumState.data.subjects.some((s) => s.enabled);
   const onboardingSteps = [
     {
-      label: 'Enable your subjects',
-      description: 'Choose which subjects this school teaches.',
+      label: 'Subjects assigned by Nool',
+      description: 'Your platform admin assigns this school its subjects - view them here.',
       href: '/curriculum',
       done: hasEnabledSubject,
     },
@@ -139,6 +139,7 @@ export default function DashboardPage() {
       {anyCoreLoading ? <LoadingState label="Loading dashboard" /> : null}
       {anyCoreError ? (
         <ErrorState
+          error={[teachersState, studentsState, classesState].map((st) => (st.status === 'error' ? st.error : null)).find(Boolean)}
           onRetry={() => {
             if (teachersState.status === 'error') teachersState.retry();
             if (studentsState.status === 'error') studentsState.retry();
@@ -194,7 +195,7 @@ export default function DashboardPage() {
               </div>
               <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
                 {analyticsState.status === 'loading' ? <LoadingState label="Loading analytics" /> : null}
-                {analyticsState.status === 'error' ? <ErrorState onRetry={analyticsState.retry} /> : null}
+                {analyticsState.status === 'error' ? <ErrorState error={analyticsState.error} onRetry={analyticsState.retry} /> : null}
                 {analyticsState.status === 'success' && analyticsState.data.classBreakdown.length === 0 ? (
                   <p>No mastery data yet - it will appear once classes start taking tests.</p>
                 ) : null}
@@ -242,7 +243,7 @@ export default function DashboardPage() {
               </div>
               <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
                 {subscriptionState.status === 'loading' ? <LoadingState label="Loading subscription" /> : null}
-                {subscriptionState.status === 'error' ? <ErrorState onRetry={subscriptionState.retry} /> : null}
+                {subscriptionState.status === 'error' ? <ErrorState error={subscriptionState.error} onRetry={subscriptionState.retry} /> : null}
                 {subscriptionState.status === 'success' ? (
                   <>
                     <div className="checkrow" style={{ paddingTop: 0 }}>
@@ -300,7 +301,7 @@ export default function DashboardPage() {
               </div>
               <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
                 {leaderboardState.status === 'loading' ? <LoadingState label="Loading leaderboard" /> : null}
-                {leaderboardState.status === 'error' ? <ErrorState onRetry={leaderboardState.retry} /> : null}
+                {leaderboardState.status === 'error' ? <ErrorState error={leaderboardState.error} onRetry={leaderboardState.retry} /> : null}
                 {leaderboardState.status === 'success' && leaderboardState.data.items.length === 0 ? (
                   <p>No leaderboard activity yet.</p>
                 ) : null}
@@ -329,7 +330,7 @@ export default function DashboardPage() {
               </div>
               <div className="card">
                 {auditState.status === 'loading' ? <LoadingState label="Loading activity" /> : null}
-                {auditState.status === 'error' ? <ErrorState onRetry={auditState.retry} /> : null}
+                {auditState.status === 'error' ? <ErrorState error={auditState.error} onRetry={auditState.retry} /> : null}
                 {auditState.status === 'success' && auditState.data.items.length === 0 ? (
                   <p>No activity recorded yet.</p>
                 ) : null}

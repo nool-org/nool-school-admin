@@ -135,7 +135,7 @@ export default function SettingsPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading your profile" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' ? (
         <div className="settings-grid">
@@ -223,7 +223,7 @@ export default function SettingsPage() {
               Shown wherever {state.data.schoolName}&apos;s identity appears across the platform.
             </p>
             {logoState.status === 'loading' ? <LoadingState label="Loading logo" /> : null}
-            {logoState.status === 'error' ? <ErrorState onRetry={logoState.retry} /> : null}
+            {logoState.status === 'error' ? <ErrorState error={logoState.error} onRetry={logoState.retry} /> : null}
             {logoState.status === 'success' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div

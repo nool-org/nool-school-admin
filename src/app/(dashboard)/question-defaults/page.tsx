@@ -107,7 +107,7 @@ export default function QuestionDefaultsPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading question defaults" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' ? (
         <div className="card" style={{ maxWidth: 640 }}>

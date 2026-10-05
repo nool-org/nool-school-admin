@@ -3,7 +3,7 @@
 import type { GridColDef } from '@mui/x-data-grid';
 
 import { DataTable } from '@/components/DataTable';
-import { ErrorState, LoadingState } from '@/components/states';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { getCurriculum } from '@/lib/api';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { SubjectToggle } from '@/lib/types';
@@ -11,11 +11,10 @@ import type { SubjectToggle } from '@/lib/types';
 const columns: GridColDef<SubjectToggle>[] = [
   { field: 'name', headerName: 'Subject', flex: 1, minWidth: 220 },
   {
-    field: 'enabled',
-    headerName: 'Assigned',
+    field: 'grade',
+    headerName: 'Grade',
     width: 120,
-    sortable: false,
-    renderCell: (params) => <span className={`tag ${params.row.enabled ? 'green' : 'red'}`}>{params.row.enabled ? 'Yes' : 'No'}</span>,
+    valueGetter: (_value, row) => (row.grade == null ? '—' : `Grade ${row.grade}`),
   },
 ];
 
@@ -29,6 +28,7 @@ const columns: GridColDef<SubjectToggle>[] = [
  */
 export default function CurriculumPage() {
   const state = useAsyncData('curriculum', () => getCurriculum());
+  const subjects = state.status === 'success' ? state.data.subjects.filter((s) => s.enabled) : [];
 
   return (
     <div className="page">
@@ -37,16 +37,19 @@ export default function CurriculumPage() {
           <h1>Subjects</h1>
         </div>
         <p className="lead">
-          The subjects assigned to this school - this scopes what teachers see in their own curriculum
-          pickers. Assignment is managed by your platform admin, not here - if one you need isn&apos;t
-          listed as assigned yet, ask them.
+          The subjects Nool has assigned to this school, per grade - this scopes what teachers see in
+          their own curriculum pickers. View only: your platform admin manages them - if one you need
+          isn&apos;t listed, ask them.
         </p>
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading curriculum" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
-      {state.status === 'success' ? <DataTable rows={state.data.subjects} columns={columns} /> : null}
+      {state.status === 'success' && subjects.length === 0 ? (
+        <EmptyState title="No subjects assigned yet" message="Ask your platform admin to assign this school its subjects." />
+      ) : null}
+      {state.status === 'success' && subjects.length > 0 ? <DataTable rows={subjects} columns={columns} /> : null}
     </div>
   );
 }

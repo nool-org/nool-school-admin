@@ -63,7 +63,7 @@ export default function SchoolAuditLogPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading activity" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.items.length === 0 ? (
         <EmptyState title="No activity yet" message="Actions taken in this console will show up here." />

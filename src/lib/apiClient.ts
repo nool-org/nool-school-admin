@@ -2,6 +2,9 @@ import { getFirebaseAuth } from './firebase';
 import { AppError, AuthError, NetworkError } from './errors';
 
 const REQUEST_TIMEOUT_MS = 10_000;
+// Bulk imports parse + insert server-side and can take minutes - a short
+// timeout aborted them mid-flight and a retry then duplicated rows.
+const UPLOAD_TIMEOUT_MS = 5 * 60_000;
 
 // NGINX's /api/ location passes the path through unchanged (Core's own
 // routers are already mounted at the full /api/v1/... path) - see
@@ -182,7 +185,7 @@ export async function apiRequestList<T>(path: string, init: ApiRequestInit = {})
 export async function apiUpload<T>(path: string, file: File): Promise<T> {
   const token = await currentIdToken();
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
 
   const formData = new FormData();
   formData.append('file', file);

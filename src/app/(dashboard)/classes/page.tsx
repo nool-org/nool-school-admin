@@ -17,7 +17,6 @@ import { useToast } from '@/components/Toast';
 import {
   createClass,
   deleteClass,
-  getCurriculum,
   listClasses,
   listGrades,
   listTeachers,
@@ -25,6 +24,7 @@ import {
   updateClassAssignments,
   updateClassStatus,
 } from '@/lib/api';
+import { runBulk } from '@/lib/bulk';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { ClassAssignment, SchoolAdminClass } from '@/lib/types';
@@ -32,7 +32,6 @@ import type { ClassAssignment, SchoolAdminClass } from '@/lib/types';
 export default function ClassesPage() {
   const state = useAsyncData('classes', () => listClasses());
   const teachersState = useAsyncData('teachers', () => listTeachers());
-  const curriculumState = useAsyncData('curriculum', () => getCurriculum());
   const gradesState = useAsyncData('grades-for-sections', () => listGrades());
   const { show } = useToast();
 
@@ -160,32 +159,38 @@ export default function ClassesPage() {
 
   async function handleBulkDelete() {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => deleteClass(String(id))));
-      show(`${selectedIds.length} section${selectedIds.length === 1 ? '' : 's'} deleted.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeleteOpen(false);
-      if (state.status === 'success') state.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => deleteClass(id), {
+      noun: 'section',
+      verb: 'deleted',
+      label: (id) => {
+        const c = classes.find((x) => x.id === id);
+        return c ? `Class ${c.grade} · ${c.section}` : id;
+      },
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeleteOpen(false);
+    if (state.status === 'success') state.refetch();
+    setBulkBusy(false);
   }
 
   async function handleBulkStatus(next: 'ACTIVE' | 'DEACTIVATED') {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => updateClassStatus(String(id), next)));
-      show(`${selectedIds.length} section${selectedIds.length === 1 ? '' : 's'} updated.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeactivateOpen(false);
-      if (state.status === 'success') state.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => updateClassStatus(id, next), {
+      noun: 'section',
+      verb: 'updated',
+      label: (id) => {
+        const c = classes.find((x) => x.id === id);
+        return c ? `Class ${c.grade} · ${c.section}` : id;
+      },
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeactivateOpen(false);
+    if (state.status === 'success') state.refetch();
+    setBulkBusy(false);
   }
 
   const columns: GridColDef<SchoolAdminClass>[] = [
@@ -263,7 +268,7 @@ export default function ClassesPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading sections" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && classes.length === 0 ? (
         <EmptyState
@@ -390,8 +395,12 @@ export default function ClassesPage() {
       <AssignClassModal
         open={assigning !== null}
         schoolClass={assigning}
+        gradeId={
+          gradesState.status === 'success' && assigning
+            ? (gradesState.data.find((g) => g.grade === assigning.grade)?.id ?? null)
+            : null
+        }
         teachers={teachersState.status === 'success' ? teachersState.data : []}
-        subjects={curriculumState.status === 'success' ? curriculumState.data.subjects : []}
         onSave={handleSaveAssignments}
         onClose={() => setAssigning(null)}
       />

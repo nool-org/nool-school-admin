@@ -257,7 +257,7 @@ export default function ReportsPage() {
       </div>
 
       {dimensionsState.status === 'loading' ? <LoadingState label="Loading report options" /> : null}
-      {dimensionsState.status === 'error' ? <ErrorState onRetry={dimensionsState.retry} /> : null}
+      {dimensionsState.status === 'error' ? <ErrorState error={dimensionsState.error} onRetry={dimensionsState.retry} /> : null}
 
       {dimensionsState.status === 'success' ? (
         <div className="card" style={{ marginBottom: 20 }}>
@@ -356,7 +356,7 @@ export default function ReportsPage() {
         <h3>Saved reports</h3>
       </div>
       {configsState.status === 'loading' ? <LoadingState label="Loading saved reports" /> : null}
-      {configsState.status === 'error' ? <ErrorState onRetry={configsState.retry} /> : null}
+      {configsState.status === 'error' ? <ErrorState error={configsState.error} onRetry={configsState.retry} /> : null}
       {configsState.status === 'success' && configsState.data.length === 0 ? (
         <p style={{ color: 'var(--color-muted)' }}>No saved reports yet - build one above and save it.</p>
       ) : null}
@@ -368,7 +368,7 @@ export default function ReportsPage() {
         <h3>Shared with your school</h3>
       </div>
       {sharedState.status === 'loading' ? <LoadingState label="Loading shared reports" /> : null}
-      {sharedState.status === 'error' ? <ErrorState onRetry={sharedState.retry} /> : null}
+      {sharedState.status === 'error' ? <ErrorState error={sharedState.error} onRetry={sharedState.retry} /> : null}
       {sharedState.status === 'success' && sharedState.data.length === 0 ? (
         <p style={{ color: 'var(--color-muted)' }}>
           No reports have been shared with your school by noolAI yet.

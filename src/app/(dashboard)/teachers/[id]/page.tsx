@@ -82,7 +82,7 @@ export default function TeacherDetailPage() {
   if (teachersState.status === 'error') {
     return (
       <div className="page">
-        <ErrorState onRetry={teachersState.retry} />
+        <ErrorState error={teachersState.error} onRetry={teachersState.retry} />
       </div>
     );
   }
@@ -139,7 +139,7 @@ export default function TeacherDetailPage() {
 
       <h2 style={{ marginBottom: 12 }}>Voice Tests created</h2>
       {testsState.status === 'loading' ? <LoadingState label="Loading tests" /> : null}
-      {testsState.status === 'error' ? <ErrorState onRetry={testsState.retry} /> : null}
+      {testsState.status === 'error' ? <ErrorState error={testsState.error} onRetry={testsState.retry} /> : null}
       {testsState.status === 'success' && testsState.data.items.length === 0 ? (
         <EmptyState title="No tests yet" message="Tests this teacher creates will show up here." />
       ) : null}
@@ -151,7 +151,7 @@ export default function TeacherDetailPage() {
 
       <h2 style={{ marginBottom: 12 }}>Question Papers created</h2>
       {papersState.status === 'loading' ? <LoadingState label="Loading question papers" /> : null}
-      {papersState.status === 'error' ? <ErrorState onRetry={papersState.retry} /> : null}
+      {papersState.status === 'error' ? <ErrorState error={papersState.error} onRetry={papersState.retry} /> : null}
       {papersState.status === 'success' && papersState.data.items.length === 0 ? (
         <EmptyState title="No question papers yet" message="Papers this teacher creates will show up here." />
       ) : null}

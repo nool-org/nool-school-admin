@@ -64,7 +64,7 @@ export default function StudentDetailPage() {
   if (studentsState.status === 'error') {
     return (
       <div className="page">
-        <ErrorState onRetry={studentsState.retry} />
+        <ErrorState error={studentsState.error} onRetry={studentsState.retry} />
       </div>
     );
   }
@@ -129,7 +129,7 @@ export default function StudentDetailPage() {
         per-student activity separately from class-level assignment.
       </p>
       {homeworkState.status === 'loading' ? <LoadingState label="Loading homework" /> : null}
-      {homeworkState.status === 'error' ? <ErrorState onRetry={homeworkState.retry} /> : null}
+      {homeworkState.status === 'error' ? <ErrorState error={homeworkState.error} onRetry={homeworkState.retry} /> : null}
       {homeworkState.status === 'success' && homeworkState.data.items.length === 0 ? (
         <EmptyState title="No homework yet" message="Homework assigned to this class will show up here." />
       ) : null}

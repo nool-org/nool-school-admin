@@ -62,7 +62,7 @@ export default function SchoolLeaderboardPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading leaderboard" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.items.length === 0 ? (
         <EmptyState title="No students yet" message="Once students earn points, the ranking will show up here." />

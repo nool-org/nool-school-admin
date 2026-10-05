@@ -26,6 +26,7 @@ import {
   sendStudentCredentialsEmail,
   updateStudent,
 } from '@/lib/api';
+import { runBulk } from '@/lib/bulk';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlParam } from '@/lib/useUrlState';
@@ -226,32 +227,32 @@ export default function StudentsPage() {
 
   async function handleBulkDelete() {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => deleteStudent(String(id))));
-      show(`${selectedIds.length} student${selectedIds.length === 1 ? '' : 's'} deleted.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeleteOpen(false);
-      if (studentsState.status === 'success') studentsState.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => deleteStudent(id), {
+      noun: 'student',
+      verb: 'deleted',
+      label: (id) => students.find((s) => s.id === id)?.displayName ?? id,
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeleteOpen(false);
+    if (studentsState.status === 'success') studentsState.refetch();
+    setBulkBusy(false);
   }
 
   async function handleBulkStatus(next: UserStatus) {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => updateStudent(String(id), { status: next })));
-      show(`${selectedIds.length} student${selectedIds.length === 1 ? '' : 's'} updated.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeactivateOpen(false);
-      if (studentsState.status === 'success') studentsState.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => updateStudent(id, { status: next }), {
+      noun: 'student',
+      verb: 'updated',
+      label: (id) => students.find((s) => s.id === id)?.displayName ?? id,
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeactivateOpen(false);
+    if (studentsState.status === 'success') studentsState.refetch();
+    setBulkBusy(false);
   }
 
   const columns: GridColDef<SchoolStudent>[] = [
@@ -354,7 +355,7 @@ export default function StudentsPage() {
       </div>
 
       {studentsState.status === 'loading' ? <LoadingState label="Loading students" /> : null}
-      {studentsState.status === 'error' ? <ErrorState onRetry={studentsState.retry} /> : null}
+      {studentsState.status === 'error' ? <ErrorState error={studentsState.error} onRetry={studentsState.retry} /> : null}
 
       {studentsState.status === 'success' && students.length === 0 ? (
         <EmptyState

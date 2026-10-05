@@ -107,6 +107,7 @@ export function BulkUploadModal({
             <input
               type="file"
               accept=".csv,.xlsx"
+              disabled={submitting}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
             <p style={{ marginTop: 10 }}>Accepts .csv or .xlsx, up to 500 rows.</p>

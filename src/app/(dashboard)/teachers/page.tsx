@@ -26,6 +26,7 @@ import {
   updateTeacher,
   updateTeacherStatus,
 } from '@/lib/api';
+import { runBulk } from '@/lib/bulk';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { SchoolTeacher, UserStatus } from '@/lib/types';
@@ -212,32 +213,32 @@ export default function TeachersPage() {
 
   async function handleBulkDelete() {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => deleteTeacher(String(id))));
-      show(`${selectedIds.length} teacher${selectedIds.length === 1 ? '' : 's'} deleted.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeleteOpen(false);
-      if (state.status === 'success') state.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => deleteTeacher(id), {
+      noun: 'teacher',
+      verb: 'deleted',
+      label: (id) => teachers.find((t) => t.id === id)?.displayName ?? id,
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeleteOpen(false);
+    if (state.status === 'success') state.refetch();
+    setBulkBusy(false);
   }
 
   async function handleBulkStatus(next: UserStatus) {
     setBulkBusy(true);
-    try {
-      await Promise.all(selectedIds.map((id) => updateTeacherStatus(String(id), next)));
-      show(`${selectedIds.length} teacher${selectedIds.length === 1 ? '' : 's'} updated.`, 'success');
-      setSelection(EMPTY_SELECTION);
-      setBulkDeactivateOpen(false);
-      if (state.status === 'success') state.refetch();
-    } catch (cause) {
-      show(normalizeError(cause).message, 'error');
-    } finally {
-      setBulkBusy(false);
-    }
+    const { failedIds, summary } = await runBulk(selectedIds, (id) => updateTeacherStatus(id, next), {
+      noun: 'teacher',
+      verb: 'updated',
+      label: (id) => teachers.find((t) => t.id === id)?.displayName ?? id,
+    });
+    show(summary, failedIds.length > 0 ? 'error' : 'success');
+    // Keep only the rows that failed selected, so the admin can retry them.
+    setSelection({ type: 'include', ids: new Set(failedIds) });
+    setBulkDeactivateOpen(false);
+    if (state.status === 'success') state.refetch();
+    setBulkBusy(false);
   }
 
   const columns: GridColDef<SchoolTeacher>[] = [
@@ -330,7 +331,7 @@ export default function TeachersPage() {
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading teachers" /> : null}
-      {state.status === 'error' ? <ErrorState onRetry={state.retry} /> : null}
+      {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' ? (
         <>
