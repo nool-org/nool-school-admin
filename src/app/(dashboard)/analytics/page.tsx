@@ -80,8 +80,8 @@ const slippingColumns: GridColDef<SlippingStudent>[] = [
   },
   {
     field: 'earlierAvgPercent',
-    headerName: 'Their earlier average',
-    width: 180,
+    headerName: 'Before (their average)',
+    width: 200,
     valueGetter: (_value, row) => (row.earlierAvgPercent === null ? 'First challenge' : `${row.earlierAvgPercent}%`),
   },
 ];
@@ -128,7 +128,14 @@ export default function AnalyticsPage() {
             <h3>Mastery trend</h3>
           </div>
           <div className="card" style={{ marginBottom: 24 }}>
-            <TrendChart points={trend.map((p) => ({ label: p.periodLabel, value: p.masteryAvgPercent }))} />
+            {trend.length < 2 ? (
+              <p className="lead" style={{ margin: 0 }}>
+                The trend line starts after two weeks of challenges
+                {trend.length === 1 ? ` - week of ${trend[0].periodLabel}: ${trend[0].masteryAvgPercent}% average` : ''}.
+              </p>
+            ) : (
+              <TrendChart points={trend.map((p) => ({ label: p.periodLabel, value: p.masteryAvgPercent }))} />
+            )}
           </div>
 
           <div className="dashboard-columns" style={{ marginBottom: 24 }}>
