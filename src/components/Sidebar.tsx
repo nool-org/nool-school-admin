@@ -198,7 +198,7 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
-    label: "Activity",
+    label: "Challenges",
     items: [
       {
         href: "/activity/tests",
@@ -211,6 +211,11 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
         label: "Maths challenges",
         icon: "tests",
       },
+    ],
+  },
+  {
+    label: "Learning",
+    items: [
       {
         href: "/activity/homework",
         label: "Homework",
