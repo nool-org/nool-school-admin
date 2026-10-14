@@ -245,7 +245,28 @@ export interface ClassBreakdown {
   classId: string;
   label: string;
   masteryAvgPercent: number;
+  /** The class's latest challenge average minus its first one's. */
   improvementPercent: number;
+  challengesTaken: number;
+  studentsAssessed: number;
+}
+
+export interface WeakChapter {
+  chapterId: string;
+  chapter: string;
+  subject: string;
+  averagePercent: number;
+  students: number;
+  classes: string[];
+}
+
+export interface SlippingStudent {
+  studentId: string;
+  name: string;
+  classLabel: string;
+  chapter: string;
+  latestPercent: number;
+  earlierAvgPercent: number | null;
 }
 
 export interface MasteryTrendPoint {
@@ -259,6 +280,8 @@ export interface SchoolAnalytics {
   classBreakdown: ClassBreakdown[];
   bloomAverages: BloomScore[];
   masteryTrend: MasteryTrendPoint[];
+  weakChapters: WeakChapter[];
+  slippingStudents: SlippingStudent[];
 }
 
 /** Envelope every paginated oversight endpoint returns - see apiClient.ts's

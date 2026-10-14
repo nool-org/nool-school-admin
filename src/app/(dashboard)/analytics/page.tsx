@@ -4,11 +4,11 @@ import Link from 'next/link';
 import type { GridColDef } from '@mui/x-data-grid';
 
 import { DataTable } from '@/components/DataTable';
-import { ErrorState, LoadingState } from '@/components/states';
+import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { TrendChart } from '@/components/TrendChart';
 import { getAnalytics } from '@/lib/api';
 import { useAsyncData } from '@/lib/useAsyncData';
-import type { ClassBreakdown } from '@/lib/types';
+import type { ClassBreakdown, SlippingStudent, WeakChapter } from '@/lib/types';
 
 const BLOOM_LABEL: Record<string, string> = {
   REMEMBER: 'Remember',
@@ -30,10 +30,59 @@ const columns: GridColDef<ClassBreakdown>[] = [
   },
   {
     field: 'improvementPercent',
-    headerName: 'Improvement',
+    headerName: 'First → latest challenge',
     flex: 1,
-    minWidth: 140,
-    valueGetter: (_value, row) => (row.improvementPercent >= 0 ? `+${row.improvementPercent}` : row.improvementPercent),
+    minWidth: 180,
+    renderCell: (params) =>
+      params.row.challengesTaken < 2 ? (
+        '—'
+      ) : (
+        <span className={`tag ${params.row.improvementPercent >= 0 ? 'green' : 'red'}`}>
+          {params.row.improvementPercent >= 0 ? '+' : ''}
+          {params.row.improvementPercent} pts
+        </span>
+      ),
+  },
+  { field: 'challengesTaken', headerName: 'Challenges', width: 120 },
+  { field: 'studentsAssessed', headerName: 'Students assessed', width: 160 },
+];
+
+const scoreTag = (percent: number) => (percent >= 70 ? 'green' : percent >= 40 ? 'yellow' : 'red');
+
+const chapterColumns: GridColDef<WeakChapter>[] = [
+  { field: 'chapter', headerName: 'Chapter', flex: 1.4, minWidth: 200 },
+  { field: 'subject', headerName: 'Subject', flex: 0.8, minWidth: 120 },
+  {
+    field: 'averagePercent',
+    headerName: 'Average',
+    width: 110,
+    renderCell: (params) => <span className={`tag ${scoreTag(params.row.averagePercent)}`}>{params.row.averagePercent}%</span>,
+  },
+  { field: 'students', headerName: 'Students', width: 100 },
+  {
+    field: 'classes',
+    headerName: 'Classes',
+    flex: 1,
+    minWidth: 160,
+    valueGetter: (_value, row) => row.classes.join(', '),
+  },
+];
+
+const slippingColumns: GridColDef<SlippingStudent>[] = [
+  { field: 'name', headerName: 'Student', flex: 1, minWidth: 160 },
+  { field: 'classLabel', headerName: 'Class', width: 130 },
+  { field: 'chapter', headerName: 'Latest challenge', flex: 1.2, minWidth: 180 },
+  {
+    field: 'latestPercent',
+    headerName: 'Latest',
+    width: 100,
+    renderCell: (params) => <span className={`tag ${scoreTag(params.row.latestPercent)}`}>{params.row.latestPercent}%</span>,
+  },
+  {
+    field: 'earlierAvgPercent',
+    headerName: 'Their earlier average',
+    width: 180,
+    valueGetter: (_value, row) => (row.earlierAvgPercent === null ? 'First challenge' : `${row.earlierAvgPercent}%`),
   },
 ];
 
@@ -115,6 +164,32 @@ export default function AnalyticsPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          <div className="section-head" style={{ marginBottom: 12 }}>
+            <h3>Chapters needing attention</h3>
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            {state.data.weakChapters.length === 0 ? (
+              <EmptyState title="No challenges yet" message="Chapters show up here once classes take a challenge on them." />
+            ) : (
+              <DataTable rows={state.data.weakChapters} columns={chapterColumns} getRowId={(row) => row.chapterId} />
+            )}
+          </div>
+
+          <div className="section-head" style={{ marginBottom: 12 }}>
+            <h3>Students slipping</h3>
+          </div>
+          <p className="lead" style={{ marginBottom: 12 }}>
+            Their latest challenge is 15+ points under their own earlier average, or under 40%. Worth a word from
+            their teacher.
+          </p>
+          <div style={{ marginBottom: 24 }}>
+            {state.data.slippingStudents.length === 0 ? (
+              <EmptyState title="Nobody is slipping" message="No student has dropped sharply on their latest challenge." />
+            ) : (
+              <DataTable rows={state.data.slippingStudents} columns={slippingColumns} getRowId={(row) => row.studentId} />
+            )}
           </div>
 
           <div className="section-head" style={{ marginBottom: 12 }}>
