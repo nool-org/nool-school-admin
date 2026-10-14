@@ -5,6 +5,7 @@ import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '@/components/DataTable';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { getSchoolLeaderboard, listClasses } from '@/lib/api';
+import { SearchBox } from '@/components/SearchBox';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
 import type { SchoolLeaderboardEntry } from '@/lib/types';
@@ -20,13 +21,15 @@ const columns: GridColDef<SchoolLeaderboardEntry>[] = [
 
 export default function SchoolLeaderboardPage() {
   const [classFilter, setClassFilter] = useUrlParam('classId', '');
+  const [search, setSearch] = useUrlParam('q', '');
   const [paginationModel, setPaginationModel] = useUrlPaginationModel(PAGE_SIZE);
   const classesState = useAsyncData('classes', () => listClasses());
   const state = useAsyncData(
-    `leaderboard:${classFilter}:${paginationModel.page}:${paginationModel.pageSize}`,
+    `leaderboard:${classFilter}:${search}:${paginationModel.page}:${paginationModel.pageSize}`,
     () =>
       getSchoolLeaderboard({
         classId: classFilter || undefined,
+        q: search || undefined,
         limit: paginationModel.pageSize,
         offset: paginationModel.page * paginationModel.pageSize,
       }),
@@ -43,6 +46,14 @@ export default function SchoolLeaderboardPage() {
       </div>
 
       <div className="table-toolbar">
+        <SearchBox
+          value={search}
+          onChange={(next) => {
+            setSearch(next);
+            setPaginationModel({ page: 0, pageSize: PAGE_SIZE });
+          }}
+          placeholder="Search for a student"
+        />
         <select
           className="field"
           style={{ maxWidth: 240 }}

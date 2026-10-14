@@ -31,6 +31,7 @@ import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlParam } from '@/lib/useUrlState';
 import type { SchoolStudent, UserStatus } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 interface StudentCredential {
   id: string;
@@ -286,7 +287,7 @@ export default function StudentsPage() {
       headerName: 'Status',
       width: 130,
       renderCell: (params) => (
-        <span className={`tag ${params.row.status === 'ACTIVE' ? 'green' : 'red'}`}>{params.row.status}</span>
+        <span className={`tag ${params.row.status === 'ACTIVE' ? 'green' : 'red'}`}>{statusLabel(params.row.status)}</span>
       ),
     },
     {

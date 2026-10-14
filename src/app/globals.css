@@ -1627,3 +1627,563 @@ table.data-table tbody tr:hover {
 .login-brand span {
   color: var(--color-yellow-hover);
 }
+
+/* ---------- Retouch: the noolAI app's playful look (2026-10) ----------
+   Same language as the student/teacher app (nool-apps theme/pop.ts):
+   warm cream, ink outlines with a hard offset shadow, pastel tiles,
+   Fredoka headings + Nunito body - semibold at most, never heavy. Kept as
+   one override layer at the end so every page repaints through the
+   existing class names. */
+:root {
+  --color-bg: #fff8f2;
+  --color-ink: #2d3748;
+  --color-ink-2: #2d3748;
+  --color-muted: #64748b;
+  --color-muted-2: #94a3b8;
+  --color-line: #e7dfd6;
+  --color-line-soft: #f4ede6;
+  --color-black: #2d3748;
+  --color-yellow: #ffe58f;
+  --color-yellow-soft: #fff4c7;
+  --color-yellow-hover: #ffd966;
+  --color-primary: #2d3748;
+  --color-primary-hover: #1f2937;
+  --color-accent-ink: #7a5b00;
+  --pastel-mint: #a7f3b8;
+  --pastel-sky: #a8d8ea;
+  --pastel-salmon: #ffb4a8;
+  --pastel-lavender: #dcd6ff;
+  --outline: 2px solid #2d3748;
+  --pop-raised: 4px 4px 0 #2d3748;
+  --pop-small: 3px 3px 0 #2d3748;
+  --font-base: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: var(--font-fredoka), var(--font-nunito), system-ui, sans-serif;
+  --fs-base: 14px;
+  --fs-md: 13.5px;
+  --fw-bold: 600;
+  --fw-black: 600;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+body {
+  line-height: 1.5;
+}
+h1,
+h2,
+h3,
+.stat strong,
+.sidebar-brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+h1 {
+  font-size: 30px;
+}
+
+/* cards, stats, tables, modals: outlined with a hard shadow */
+.card,
+.stat,
+.table-wrap,
+.state-card,
+.modal {
+  border: var(--outline);
+  box-shadow: var(--pop-raised);
+  border-radius: var(--radius-lg);
+}
+.stat:hover {
+  box-shadow: 6px 6px 0 #2d3748;
+  transform: translate(-2px, -2px);
+}
+.page-head {
+  border-bottom: none;
+}
+
+/* buttons: pill-ish, outlined, pressed on click */
+.btn {
+  border: var(--outline);
+  border-radius: 14px;
+  box-shadow: var(--pop-small);
+  font-weight: 600;
+}
+.btn:not(:disabled):active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+.btn.yellow {
+  background: var(--color-yellow);
+  border-color: #2d3748;
+  color: #2d3748;
+}
+.btn.dark {
+  background: #2d3748;
+  color: #fff;
+}
+.btn.white {
+  background: #fff;
+  color: #2d3748;
+}
+
+/* tags: pastel pills with an outline */
+.tag {
+  border: 1.5px solid #2d3748;
+  font-weight: 600;
+}
+
+/* inputs */
+.field input,
+.field select,
+.field textarea,
+.search-field {
+  border: var(--outline);
+  border-radius: 12px;
+}
+
+/* sidebar: light, not a black slab */
+.sidebar {
+  background: #fffdf9;
+  border-right: var(--outline);
+  color: #2d3748;
+}
+.sidebar-brand {
+  color: #2d3748;
+}
+.sidebar-brand span {
+  color: #e0a800;
+}
+.sidebar-section-label {
+  color: var(--color-muted);
+}
+.sidebar-link {
+  color: #475569;
+  font-weight: 500;
+}
+.sidebar-link:hover {
+  background: var(--color-line-soft);
+  color: #2d3748;
+}
+.sidebar-link.active {
+  background: var(--color-yellow);
+  color: #2d3748;
+  border: var(--outline);
+  box-shadow: var(--pop-small);
+  font-weight: 600;
+}
+.sidebar-foot {
+  border-top: 2px solid var(--color-line);
+}
+.sidebar-user,
+.sidebar-signout,
+.notif-bell {
+  color: #2d3748;
+}
+
+/* retouch, part 2: insight cards, the signed-in user, MUI text */
+.insight-card {
+  border: var(--outline) !important;
+  box-shadow: var(--pop-raised) !important;
+  border-radius: var(--radius-lg) !important;
+}
+.insight-card.dark {
+  background: var(--pastel-lavender) !important;
+  color: #2d3748 !important;
+}
+.insight-card.dark * {
+  color: #2d3748 !important;
+}
+.insight-icon {
+  border: 1.5px solid #2d3748;
+}
+.sidebar-user strong {
+  color: #2d3748;
+}
+.sidebar-user small,
+.sidebar-user svg {
+  color: var(--color-muted);
+}
+.sidebar-user:hover,
+.sidebar-user.active,
+.sidebar-signout:hover {
+  background: var(--color-line-soft);
+  color: #2d3748;
+}
+.sidebar-signout {
+  color: #475569;
+}
+
+/* retouch, part 3: logo, header, login, nav, buttons - the app's language */
+
+/* the noolAI wordmark: its own font and ink, whatever the theme */
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-word {
+  font-family: var(--font-brand), var(--font-nunito), sans-serif;
+  font-weight: 800;
+  color: #14161b;
+  line-height: 1;
+}
+.brand-ai {
+  color: #ffc800;
+}
+.brand-suffix {
+  font-family: var(--font-nunito), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #2d3748;
+  background: var(--color-yellow);
+  border: 1.5px solid #2d3748;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.sidebar-brand {
+  padding: 8px 10px 16px;
+  font-size: inherit;
+  letter-spacing: 0;
+}
+
+/* header: sticky, the signed-in user and Sign out on the right */
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 28px;
+  background: rgba(255, 248, 242, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 2px solid var(--color-line);
+}
+.topbar-grow {
+  flex: 1;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar .sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  width: auto;
+}
+.topbar .sidebar-user:hover,
+.topbar .sidebar-user.active {
+  background: #fff;
+  border-color: #2d3748;
+}
+.topbar .sidebar-user .avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #2d3748;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+}
+.topbar .sidebar-user .grow {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.topbar .sidebar-user strong {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.topbar .sidebar-user small {
+  font-size: 11.5px;
+}
+.topbar .sidebar-signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: 38px;
+  padding: 0 14px;
+  border: var(--outline);
+  border-radius: 12px;
+  background: #fff;
+  color: #2d3748;
+  font-weight: 600;
+  box-shadow: var(--pop-small);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.topbar .sidebar-signout:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #2d3748;
+  background: var(--pastel-salmon);
+}
+.topbar .sidebar-signout:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+.topbar .notif-bell {
+  border: 2px solid transparent;
+  border-radius: 12px;
+}
+.topbar .notif-bell:hover {
+  border-color: #2d3748;
+  background: #fff;
+}
+.topbar .notif-panel {
+  top: 48px;
+  right: 0;
+  left: auto;
+  bottom: auto;
+}
+
+/* sidebar nav: compact rows, a thin scrollbar that only shows on hover */
+.sidebar {
+  padding: 16px 12px;
+}
+.sidebar-nav {
+  gap: 2px;
+  padding: 2px 6px 8px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.sidebar-nav:hover {
+  scrollbar-color: #d6cbbf transparent;
+}
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background: #d6cbbf;
+}
+.sidebar-section-label {
+  padding: 14px 10px 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.6px;
+}
+.sidebar-link {
+  padding: 7px 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 13.5px;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.sidebar-link:hover {
+  border-color: #e7dfd6;
+}
+
+/* buttons: lift on hover, press on click - like the app's pop() */
+.btn {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+.btn:not(:disabled):hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #2d3748;
+}
+.btn.yellow:not(:disabled):hover {
+  background: var(--color-yellow-hover);
+}
+.btn.dark:not(:disabled):hover {
+  background: #1f2937;
+}
+.btn.white:not(:disabled):hover {
+  background: #fffaf3;
+}
+.btn:not(:disabled):active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+.btn:disabled {
+  box-shadow: none;
+  opacity: 0.5;
+}
+.link-btn {
+  color: #7a5b00;
+  font-weight: 600;
+}
+.link-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* login: a brand panel beside an outlined form card */
+.login-shell {
+  background: var(--color-bg);
+}
+.login-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  gap: 32px;
+  align-items: stretch;
+  width: min(920px, 100% - 32px);
+}
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+  background: var(--color-yellow);
+  border: var(--outline);
+  border-radius: 24px;
+  box-shadow: var(--pop-raised);
+}
+.login-hero-line {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.3;
+  color: #2d3748;
+}
+.login-hero-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.login-hero-points li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: #2d3748;
+}
+.login-hero-points li::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2d3748;
+  flex: none;
+}
+.login-card {
+  border: var(--outline);
+  box-shadow: var(--pop-raised);
+  border-radius: 24px;
+  padding: 36px;
+  width: 100%;
+}
+.login-brand {
+  margin-bottom: 24px;
+}
+.login-card label {
+  font-weight: 600;
+  color: #2d3748;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+.login-card input.field {
+  height: 46px;
+  border: var(--outline);
+  border-radius: 12px;
+  padding: 0 14px;
+  background: #fff;
+}
+.login-card input.field:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-yellow);
+}
+@media (max-width: 760px) {
+  .login-split {
+    grid-template-columns: 1fr;
+  }
+  .login-hero {
+    display: none;
+  }
+}
+
+/* retouch, part 4: the old .login-brand colours mustn't repaint the wordmark */
+.login-brand .brand-word,
+.sidebar-brand .brand-word {
+  color: #14161b;
+}
+.login-brand .brand-ai,
+.sidebar-brand .brand-ai {
+  color: #ffc800;
+}
+.login-brand .brand-suffix,
+.sidebar-brand .brand-suffix {
+  color: #2d3748;
+  background: var(--color-yellow);
+}
+.login-hero {
+  background: var(--pastel-lavender);
+}
+.login-hero .brand-suffix {
+  background: #fff;
+}
+.login-card .btn.dark {
+  background: #ffc800;
+  color: #2d3748;
+}
+.login-card .btn.dark:not(:disabled):hover {
+  background: #ffd23f;
+}
+
+/* every button variant gets the ink outline, whatever its older border rule */
+.btn.white,
+.btn.dark,
+.btn.yellow,
+.btn.danger,
+.btn.ghost {
+  border: 2px solid #2d3748;
+}
+
+/* filter row over a list: the search grows, every box has the outline */
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.table-toolbar select.field,
+.table-toolbar input.field,
+.list-search {
+  height: 44px;
+  border: 2px solid #2d3748;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 14px;
+  font-size: 14px;
+  min-width: 180px;
+  max-width: 260px;
+}
+.table-toolbar .list-search {
+  flex: 1;
+  max-width: 420px;
+  padding-left: 40px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center;
+}
+.table-toolbar select.field:focus,
+.table-toolbar input.field:focus,
+.list-search:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-yellow);
+}
+.table-toolbar {
+  justify-content: flex-start;
+}
+.table-toolbar input.list-search.field {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  padding-left: 40px;
+}

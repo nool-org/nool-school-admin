@@ -278,6 +278,7 @@ export interface SchoolVoiceTest {
   id: string;
   classLabel: string;
   subjectName: string;
+  chapterName?: string | null;
   teacherName: string | null;
   status: TestStatus;
   assignedCount: number;
@@ -293,6 +294,22 @@ export interface SchoolHomework {
   status: HomeworkStatus;
   assignedCount: number;
   completedCount: number;
+  /** What it follows: "Speak with Milo" or "Topic checkpoint". */
+  source?: string;
+  createdAt?: string | null;
+}
+
+export interface SchoolChallenge {
+  id: string;
+  title: string;
+  classLabel: string;
+  subjectName: string;
+  teacherName: string | null;
+  status: string;
+  studentCount: number;
+  doneCount: number;
+  averagePercent: number | null;
+  createdAt: string;
 }
 
 export interface SchoolQuestionPaper {

@@ -15,6 +15,7 @@ import { createGrade, deleteGrade, getGradeSubjects, listGrades, updateGradeStat
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { MAX_GRADE, MIN_GRADE, subjectLabel, type SchoolGrade, type SubjectToggle } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 /** The "Class" level (e.g. "Class 10") - the parent every Section on the
  * Sections page belongs to. See SchoolGrade's doc comment in types.ts for
@@ -140,7 +141,7 @@ export default function GradesPage() {
       headerName: 'Status',
       width: 130,
       renderCell: (params) => (
-        <span className={`tag ${params.row.status === 'DEACTIVATED' ? 'red' : 'green'}`}>{params.row.status}</span>
+        <span className={`tag ${params.row.status === 'DEACTIVATED' ? 'red' : 'green'}`}>{statusLabel(params.row.status)}</span>
       ),
     },
     {

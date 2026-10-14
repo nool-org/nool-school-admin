@@ -122,7 +122,7 @@ export default function SubscriptionPage() {
             <div className="usage-grid">
               <UsageMeter label="Teachers" used={state.data.teacherCount} limit={state.data.teacherLimit} />
               <UsageMeter label="Students" used={state.data.studentCount} limit={state.data.studentLimit} />
-              <UsageMeter label="Voice Tests" used={state.data.testCount} limit={state.data.testLimit} />
+              <UsageMeter label="Speak with Milo sessions" used={state.data.testCount} limit={state.data.testLimit} />
               <UsageMeter
                 label="Question Papers"
                 used={state.data.questionPaperCount}

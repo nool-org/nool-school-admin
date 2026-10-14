@@ -7,6 +7,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { Footer } from '@/components/Footer';
 import { getFirebaseAuth } from '@/lib/firebase';
 import { useAuth } from '@/lib/useAuth';
+import { BrandMark } from '@/components/BrandMark';
 
 export default function LoginPage() {
   const { status, profile, error, signIn } = useAuth();
@@ -68,9 +69,19 @@ export default function LoginPage() {
 
   return (
     <div className="login-shell">
-      <div className="login-card">
+      <div className="login-split">
+        <aside className="login-hero" aria-hidden="true">
+          <BrandMark suffix="school" size={34} />
+          <p className="login-hero-line">School Admin console - everything your school runs on noolAI, in one place.</p>
+          <ul className="login-hero-points">
+            <li>Classes, teachers and students</li>
+            <li>Progress across every subject</li>
+            <li>Homework, papers and Speak with Milo</li>
+          </ul>
+        </aside>
+        <div className="login-card">
         <div className="login-brand">
-          nool<span>.</span> school
+          <BrandMark suffix="school" />
         </div>
 
         {mode === 'signIn' ? (
@@ -181,6 +192,7 @@ export default function LoginPage() {
             )}
           </>
         )}
+      </div>
       </div>
       <Footer />
     </div>

@@ -92,6 +92,9 @@ export function DataTable<T extends GridValidRowModel>({
           : {
               initialState: { pagination: { paginationModel: { pageSize } } },
             })}
+        // a server-paged table only holds one page - its own search box would miss the rest,
+        // so those pages search on the server instead (SearchBox)
+        slotProps={{ toolbar: { showQuickFilter: !server } }}
         pageSizeOptions={[10, 20, 25, 50, 100]}
         density="comfortable"
       />

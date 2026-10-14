@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { BrandMark } from '@/components/BrandMark';
 
 /**
  * Catches any unhandled render/render-time error below the root layout -
@@ -18,7 +19,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
     <div className="login-shell">
       <div className="login-card">
         <div className="login-brand">
-          nool<span>.</span>
+          <BrandMark suffix="school" />
         </div>
         <h2>Something went wrong</h2>
         <p style={{ marginTop: 8, marginBottom: 20 }}>

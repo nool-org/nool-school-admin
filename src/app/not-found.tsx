@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import { BrandMark } from '@/components/BrandMark';
 
 export default function NotFound() {
   return (
     <div className="login-shell">
       <div className="login-card">
         <div className="login-brand">
-          nool<span>.</span>
+          <BrandMark suffix="school" />
         </div>
         <h2>Page not found</h2>
         <p style={{ marginTop: 8, marginBottom: 20 }}>

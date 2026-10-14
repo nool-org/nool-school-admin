@@ -5,8 +5,9 @@ import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '@/components/DataTable';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { listSchoolAuditLog } from '@/lib/api';
+import { SearchBox } from '@/components/SearchBox';
 import { useAsyncData } from '@/lib/useAsyncData';
-import { useUrlPaginationModel } from '@/lib/useUrlState';
+import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
 import type { SchoolAuditLogEntry } from '@/lib/types';
 
 const PAGE_SIZE = 20;
@@ -48,9 +49,15 @@ const columns: GridColDef<SchoolAuditLogEntry>[] = [
 
 export default function SchoolAuditLogPage() {
   const [paginationModel, setPaginationModel] = useUrlPaginationModel(PAGE_SIZE);
+  const [search, setSearch] = useUrlParam('q', '');
   const state = useAsyncData(
-    `audit-log:${paginationModel.page}:${paginationModel.pageSize}`,
-    () => listSchoolAuditLog({ limit: paginationModel.pageSize, offset: paginationModel.page * paginationModel.pageSize }),
+    `audit-log:${search}:${paginationModel.page}:${paginationModel.pageSize}`,
+    () =>
+      listSchoolAuditLog({
+        q: search || undefined,
+        limit: paginationModel.pageSize,
+        offset: paginationModel.page * paginationModel.pageSize,
+      }),
   );
 
   return (
@@ -60,6 +67,17 @@ export default function SchoolAuditLogPage() {
           <h1>Activity log</h1>
         </div>
         <p className="lead">Every change made by your school&apos;s own admin accounts.</p>
+      </div>
+
+      <div className="table-toolbar">
+        <SearchBox
+          value={search}
+          onChange={(next) => {
+            setSearch(next);
+            setPaginationModel({ page: 0, pageSize: PAGE_SIZE });
+          }}
+          placeholder="Search by action, detail or person"
+        />
       </div>
 
       {state.status === 'loading' ? <LoadingState label="Loading activity" /> : null}

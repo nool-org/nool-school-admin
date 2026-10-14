@@ -23,6 +23,7 @@ import {
   updateDatasetQuestion,
 } from '@/lib/api';
 import { normalizeError } from '@/lib/errors';
+import { SearchBox } from '@/components/SearchBox';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
 import {
@@ -119,6 +120,7 @@ export default function DatasetQuestionsPage() {
   const [subtopicFilter, setSubtopicFilter] = useUrlParam('subtopic', '');
   const [bloomFilter, setBloomFilter] = useUrlParam('bloom', '');
   const [difficultyFilter, setDifficultyFilter] = useUrlParam('difficulty', '');
+  const [search, setSearch] = useUrlParam('q', '');
   const [paginationModel, setPaginationModel] = useUrlPaginationModel(PAGE_SIZE);
   const resetPage = () => setPaginationModel({ page: 0, pageSize: paginationModel.pageSize });
 
@@ -130,7 +132,7 @@ export default function DatasetQuestionsPage() {
   );
 
   const state = useAsyncData(
-    `dataset-questions:${datasetId}:${chapterFilter}:${topicFilter}:${subtopicFilter}:${bloomFilter}:${difficultyFilter}:${paginationModel.page}:${paginationModel.pageSize}`,
+    `dataset-questions:${datasetId}:${chapterFilter}:${topicFilter}:${subtopicFilter}:${bloomFilter}:${difficultyFilter}:${search}:${paginationModel.page}:${paginationModel.pageSize}`,
     () =>
       listDatasetQuestions(datasetId, {
         chapterId: chapterFilter || undefined,
@@ -138,6 +140,7 @@ export default function DatasetQuestionsPage() {
         subtopicId: subtopicFilter || undefined,
         bloomLevel: (bloomFilter || undefined) as BloomLevel | undefined,
         difficulty: (difficultyFilter || undefined) as Difficulty | undefined,
+        q: search || undefined,
         limit: paginationModel.pageSize,
         offset: paginationModel.page * paginationModel.pageSize,
       }),
@@ -446,6 +449,14 @@ export default function DatasetQuestionsPage() {
       ) : null}
 
       <div className="table-toolbar">
+        <SearchBox
+          value={search}
+          onChange={(next) => {
+            setSearch(next);
+            resetPage();
+          }}
+          placeholder="Search question text"
+        />
         <select
           className="field"
           style={{ maxWidth: 220 }}

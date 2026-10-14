@@ -28,7 +28,7 @@ export const muiTheme = createTheme({
     text: { primary: '#171713', secondary: muted },
   },
   typography: {
-    fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
+    fontFamily: 'var(--font-nunito), var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
   },
   shape: {
     borderRadius: 10,

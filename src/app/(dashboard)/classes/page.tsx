@@ -28,6 +28,7 @@ import { runBulk } from '@/lib/bulk';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { ClassAssignment, SchoolAdminClass } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 export default function ClassesPage() {
   const state = useAsyncData('classes', () => listClasses());
@@ -216,7 +217,7 @@ export default function ClassesPage() {
       headerName: 'Status',
       width: 130,
       renderCell: (params) => (
-        <span className={`tag ${params.row.status === 'DEACTIVATED' ? 'red' : 'green'}`}>{params.row.status}</span>
+        <span className={`tag ${params.row.status === 'DEACTIVATED' ? 'red' : 'green'}`}>{statusLabel(params.row.status)}</span>
       ),
     },
     {

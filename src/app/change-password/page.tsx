@@ -11,6 +11,7 @@ import { getFirebaseAuth } from '@/lib/firebase';
 import { normalizeError } from '@/lib/errors';
 import { isPasswordValid } from '@/lib/passwordPolicy';
 import { useAuth } from '@/lib/useAuth';
+import { BrandMark } from '@/components/BrandMark';
 
 /**
  * Deliberately a top-level route, not nested under (dashboard)/ - that
@@ -65,7 +66,7 @@ export default function ChangePasswordPage() {
     <div className="login-shell">
       <div className="login-card">
         <div className="login-brand">
-          nool<span>.</span> school
+          <BrandMark suffix="school" />
         </div>
         <h2 style={{ marginBottom: 4 }}>Set a new password</h2>
         <p style={{ marginBottom: 24 }}>

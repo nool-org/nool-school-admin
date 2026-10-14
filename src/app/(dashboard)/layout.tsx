@@ -5,8 +5,9 @@ import { useEffect } from 'react';
 
 import { Footer } from '@/components/Footer';
 import { PullToRefresh } from '@/components/PullToRefresh';
-import { Sidebar } from '@/components/Sidebar';
+import { Sidebar, Topbar } from '@/components/Sidebar';
 import { useAuth } from '@/lib/useAuth';
+import { BrandMark } from '@/components/BrandMark';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { status, profile, signOut } = useAuth();
@@ -39,8 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="login-shell">
         <div className="login-card">
           <div className="login-brand">
-            nool<span>.</span>
-          </div>
+          <BrandMark suffix="school" />
+        </div>
           <h2>We couldn’t find your profile</h2>
           <p style={{ marginTop: 8, marginBottom: 20 }}>
             Your account signed in successfully, but no School Admin profile is set up for it yet.
@@ -60,8 +61,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="login-shell">
         <div className="login-card">
           <div className="login-brand">
-            nool<span>.</span>
-          </div>
+          <BrandMark suffix="school" />
+        </div>
           <h2>This account isn’t a School Admin</h2>
           <p style={{ marginTop: 8, marginBottom: 20 }}>
             {profile?.displayName ?? 'This account'} is signed in with the <b>{profile?.role}</b> role,
@@ -81,6 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="app-shell">
         <Sidebar />
         <div className="main">
+          <Topbar />
           {children}
           <Footer />
         </div>

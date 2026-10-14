@@ -354,7 +354,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="section-head" style={{ marginTop: 'var(--space-8)' }}>
-            <h3><BookIcon style={{ marginRight: 6, verticalAlign: '-2px' }} />Recent voice tests</h3>
+            <h3><BookIcon style={{ marginRight: 6, verticalAlign: '-2px' }} />Recent Speak with Milo sessions</h3>
             <Link href="/activity/tests" className="link-btn">
               View all →
             </Link>

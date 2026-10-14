@@ -1,19 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import type { SVGProps } from 'react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { SVGProps } from "react";
 
-import { NotificationsBell } from './NotificationsBell';
-import { getSchoolLogo } from '@/lib/api';
-import { useAsyncData } from '@/lib/useAsyncData';
-import { useAuth } from '@/lib/useAuth';
-import type { Feature } from '@/lib/types';
+import { NotificationsBell } from "./NotificationsBell";
+import { getSchoolLogo } from "@/lib/api";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { useAuth } from "@/lib/useAuth";
+import type { Feature } from "@/lib/types";
+import { BrandMark } from "./BrandMark";
 
 /** Minimal inline line icons - kept dependency-free rather than adding
  * lucide-react for six glyphs. Stroke-based, 16px, matches Strapi's icon
  * weight/size in its nav rail. */
-function Icon({ children, ...props }: SVGProps<SVGSVGElement> & { children: React.ReactNode }) {
+function Icon({
+  children,
+  ...props
+}: SVGProps<SVGSVGElement> & { children: React.ReactNode }) {
   return (
     <svg
       width="16"
@@ -91,7 +95,7 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M3 10h18" />
     </Icon>
   ),
-  'question-defaults': (
+  "question-defaults": (
     <Icon>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M9 12.5l2 2 4-4.5" />
@@ -110,7 +114,7 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M9 10h6M9 14h6" />
     </Icon>
   ),
-  'question-papers': (
+  "question-papers": (
     <Icon>
       <path d="M6 3h9l4 4v14H6V3Z" />
       <path d="M10 12h5M10 16h5" />
@@ -123,7 +127,7 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M8 20V10M14 20V4M20 20v-7M2 20h20" />
     </Icon>
   ),
-  'audit-log': (
+  "audit-log": (
     <Icon>
       <path d="M12 3v9l5 3" />
       <circle cx="12" cy="12" r="9" />
@@ -153,14 +157,14 @@ const ICONS_EXTRA: Record<string, React.ReactNode> = {
       <rect x="3" y="13" width="8" height="8" rx="1.5" />
     </Icon>
   ),
-  'question-bank': (
+  "question-bank": (
     <Icon>
       <path d="M4 19.5V5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5a2.5 2.5 0 0 0 0 5H20" />
       <path d="M9 8.5c0-1.4 1.1-2.5 2.6-2.5 1.4 0 2.4.9 2.4 2.1 0 1-.6 1.5-1.5 2.1-.8.5-1.3 1-1.3 1.8" />
       <circle cx="11.5" cy="15" r="0.6" fill="currentColor" />
     </Icon>
   ),
-  'sign-out': (
+  "sign-out": (
     <Icon>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <path d="M16 17l5-5-5-5" />
@@ -170,7 +174,9 @@ const ICONS_EXTRA: Record<string, React.ReactNode> = {
 };
 Object.assign(ICONS, ICONS_EXTRA);
 
-const TOP_LINKS = [{ href: '/dashboard', label: 'Dashboard', icon: 'dashboard' }];
+const TOP_LINKS = [
+  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+];
 
 interface NavItem {
   href: string;
@@ -183,71 +189,107 @@ interface NavItem {
 
 const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
-    label: 'Roster',
+    label: "Roster",
     items: [
-      { href: '/teachers', label: 'Teachers', icon: 'teachers' },
-      { href: '/students', label: 'Students', icon: 'students' },
-      { href: '/grades', label: 'Classes', icon: 'grades' },
-      { href: '/classes', label: 'Sections', icon: 'classes' },
+      { href: "/teachers", label: "Teachers", icon: "teachers" },
+      { href: "/students", label: "Students", icon: "students" },
+      { href: "/grades", label: "Classes", icon: "grades" },
+      { href: "/classes", label: "Sections", icon: "classes" },
     ],
   },
   {
-    label: 'Activity',
+    label: "Activity",
     items: [
-      { href: '/activity/tests', label: 'Voice Tests', icon: 'tests', feature: 'voice_test' },
-      { href: '/activity/homework', label: 'Homework', icon: 'homework', feature: 'homework' },
-      { href: '/activity/question-papers', label: 'Question Papers', icon: 'question-papers', feature: 'question_paper' },
-      { href: '/activity/leaderboard', label: 'Leaderboard', icon: 'leaderboard', feature: 'leaderboard' },
-      { href: '/activity/audit-log', label: 'Activity log', icon: 'audit-log' },
+      {
+        href: "/activity/tests",
+        label: "Speak with Milo",
+        icon: "tests",
+        feature: "voice_test",
+      },
+      {
+        href: "/activity/challenges",
+        label: "Maths challenges",
+        icon: "tests",
+      },
+      {
+        href: "/activity/homework",
+        label: "Homework",
+        icon: "homework",
+        feature: "homework",
+      },
+      {
+        href: "/activity/question-papers",
+        label: "Question Papers",
+        icon: "question-papers",
+        feature: "question_paper",
+      },
+      {
+        href: "/activity/leaderboard",
+        label: "Leaderboard",
+        icon: "leaderboard",
+        feature: "leaderboard",
+      },
+      { href: "/activity/audit-log", label: "Activity log", icon: "audit-log" },
     ],
   },
   {
-    label: 'School',
+    label: "School",
     items: [
-      { href: '/curriculum', label: 'Subject', icon: 'curriculum' },
-      { href: '/datasets', label: 'Datasets', icon: 'datasets' },
-      { href: '/question-bank', label: 'Question bank', icon: 'question-bank' },
-      { href: '/question-defaults', label: 'Question defaults', icon: 'question-defaults' },
-      { href: '/analytics', label: 'Analytics', icon: 'analytics' },
-      { href: '/reports', label: 'Reports', icon: 'reports' },
-      { href: '/subscription', label: 'Subscription', icon: 'subscription' },
-      { href: '/support', label: 'Support', icon: 'support' },
+      { href: "/curriculum", label: "Subject", icon: "curriculum" },
+      { href: "/datasets", label: "Datasets", icon: "datasets" },
+      { href: "/question-bank", label: "Question bank", icon: "question-bank" },
+      {
+        href: "/question-defaults",
+        label: "Question defaults",
+        icon: "question-defaults",
+      },
+      { href: "/analytics", label: "Analytics", icon: "analytics" },
+      { href: "/reports", label: "Reports", icon: "reports" },
+      { href: "/subscription", label: "Subscription", icon: "subscription" },
+      { href: "/support", label: "Support", icon: "support" },
     ],
   },
 ];
 
 function initialsFor(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '?';
-  const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+  if (parts.length === 0) return "?";
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
   return (first + last).toUpperCase();
 }
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { profile, signOut } = useAuth();
-  const logoState = useAsyncData('school-logo', () => getSchoolLogo());
-  const logoDataUri = logoState.status === 'success' ? logoState.data.logoDataUri : null;
+  const { profile } = useAuth();
+  const logoState = useAsyncData("school-logo", () => getSchoolLogo());
+  const logoDataUri =
+    logoState.status === "success" ? logoState.data.logoDataUri : null;
 
   // null enabledFeatures = every feature enabled (no plan restriction) -
   // same convention as the Plan.enabled_features field it's derived from.
   const enabledFeatures = profile?.enabledFeatures ?? null;
   const visibleNavGroups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.feature || !enabledFeatures || enabledFeatures.includes(item.feature)),
+    items: group.items.filter(
+      (item) =>
+        !item.feature ||
+        !enabledFeatures ||
+        enabledFeatures.includes(item.feature),
+    ),
   })).filter((group) => group.items.length > 0);
 
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <span className="sidebar-brand-mark">
-          nool<span>.</span>
-        </span>
-        <span className="sidebar-brand-label"> school</span>
+        <BrandMark suffix="school" />
         {logoDataUri ? (
           // eslint-disable-next-line @next/next/no-img-element -- a user-uploaded data: URI, not a static asset next/image can optimize.
-          <img src={logoDataUri} alt="School logo" className="sidebar-school-logo" />
+          <img
+            src={logoDataUri}
+            alt="School logo"
+            className="sidebar-school-logo"
+          />
         ) : null}
       </div>
       <nav className="sidebar-nav">
@@ -256,7 +298,7 @@ export function Sidebar() {
             key={item.href}
             href={item.href}
             title={item.label}
-            className={`sidebar-link${pathname === item.href ? ' active' : ''}`}
+            className={`sidebar-link${pathname === item.href ? " active" : ""}`}
           >
             {ICONS[item.icon]}
             <span className="sidebar-link-label">{item.label}</span>
@@ -270,7 +312,7 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 title={item.label}
-                className={`sidebar-link${pathname.startsWith(item.href) ? ' active' : ''}`}
+                className={`sidebar-link${pathname.startsWith(item.href) ? " active" : ""}`}
               >
                 {ICONS[item.icon]}
                 <span className="sidebar-link-label">{item.label}</span>
@@ -279,25 +321,43 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
-      <div className="sidebar-foot">
+    </aside>
+  );
+}
+
+/** The header over every page: who's signed in (and their settings), and Sign out. */
+export function Topbar() {
+  const pathname = usePathname();
+  const { profile, signOut } = useAuth();
+  return (
+    <header className="topbar">
+      <div className="topbar-grow" />
+      <div className="topbar-actions">
         <NotificationsBell />
         <Link
           href="/settings"
           title="Settings"
-          className={`sidebar-user${pathname.startsWith('/settings') ? ' active' : ''}`}
+          className={`sidebar-user${pathname.startsWith("/settings") ? " active" : ""}`}
         >
-          <div className="avatar">{initialsFor(profile?.displayName ?? '?')}</div>
+          <div className="avatar">
+            {initialsFor(profile?.displayName ?? "?")}
+          </div>
           <div className="grow">
-            <strong>{profile?.displayName ?? 'School Admin'}</strong>
-            <small>{profile?.school ?? ''}</small>
+            <strong>{profile?.displayName ?? "School Admin"}</strong>
+            <small>{profile?.school ?? ""}</small>
           </div>
           {ICONS.settings}
         </Link>
-        <button type="button" className="sidebar-signout" title="Sign out" onClick={() => void signOut()}>
-          {ICONS['sign-out']}
+        <button
+          type="button"
+          className="sidebar-signout"
+          title="Sign out"
+          onClick={() => void signOut()}
+        >
+          {ICONS["sign-out"]}
           <span className="sidebar-link-label">Sign out</span>
         </button>
       </div>
-    </aside>
+    </header>
   );
 }

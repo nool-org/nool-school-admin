@@ -5,6 +5,8 @@ import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '@/components/DataTable';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { listClasses, listSchoolVoiceTests, listTeachers } from '@/lib/api';
+import { SearchBox } from '@/components/SearchBox';
+import { statusLabel } from '@/lib/statusLabel';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
 import type { SchoolVoiceTest, TestStatus } from '@/lib/types';
@@ -18,6 +20,13 @@ function statusTagVariant(status: TestStatus): string {
 }
 
 const columns: GridColDef<SchoolVoiceTest>[] = [
+  {
+    field: 'chapterName',
+    headerName: 'Chapter',
+    flex: 1.4,
+    minWidth: 200,
+    valueGetter: (_value, row) => row.chapterName ?? '—',
+  },
   { field: 'classLabel', headerName: 'Class', flex: 1, minWidth: 140 },
   { field: 'subjectName', headerName: 'Subject', flex: 1, minWidth: 140 },
   {
@@ -31,7 +40,7 @@ const columns: GridColDef<SchoolVoiceTest>[] = [
     field: 'status',
     headerName: 'Status',
     width: 160,
-    renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{params.row.status}</span>,
+    renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{statusLabel(params.row.status)}</span>,
   },
   { field: 'assignedCount', headerName: 'Assigned', width: 100 },
   { field: 'completedCount', headerName: 'Completed', width: 110 },
@@ -46,15 +55,17 @@ const columns: GridColDef<SchoolVoiceTest>[] = [
 export default function SchoolTestsPage() {
   const [classFilter, setClassFilter] = useUrlParam('classId', '');
   const [teacherFilter, setTeacherFilter] = useUrlParam('teacherId', '');
+  const [search, setSearch] = useUrlParam('q', '');
   const [paginationModel, setPaginationModel] = useUrlPaginationModel(PAGE_SIZE);
   const classesState = useAsyncData('classes', () => listClasses());
   const teachersState = useAsyncData('teachers', () => listTeachers());
   const state = useAsyncData(
-    `voice-tests:${classFilter}:${teacherFilter}:${paginationModel.page}:${paginationModel.pageSize}`,
+    `voice-tests:${classFilter}:${teacherFilter}:${search}:${paginationModel.page}:${paginationModel.pageSize}`,
     () =>
       listSchoolVoiceTests({
         classId: classFilter || undefined,
         teacherId: teacherFilter || undefined,
+        q: search || undefined,
         limit: paginationModel.pageSize,
         offset: paginationModel.page * paginationModel.pageSize,
       }),
@@ -70,12 +81,20 @@ export default function SchoolTestsPage() {
     <div className="page">
       <div className="page-head">
         <div className="page-head-row">
-          <h1>Voice Tests</h1>
+          <h1>Speak with Milo</h1>
         </div>
-        <p className="lead">Every Test created across the school, by any teacher.</p>
+        <p className="lead">Every Speak with Milo session teachers set, across the school.</p>
       </div>
 
       <div className="table-toolbar">
+        <SearchBox
+          value={search}
+          onChange={(next) => {
+            setSearch(next);
+            resetToFirstPage();
+          }}
+          placeholder="Search by chapter or subject"
+        />
         <select
           className="field"
           style={{ maxWidth: 240 }}
@@ -114,7 +133,10 @@ export default function SchoolTestsPage() {
       {state.status === 'error' ? <ErrorState error={state.error} onRetry={state.retry} /> : null}
 
       {state.status === 'success' && state.data.items.length === 0 ? (
-        <EmptyState title="No Tests yet" message="Tests created by teachers across the school will show up here." />
+        <EmptyState
+          title={search ? 'Nothing matches' : 'No sessions yet'}
+          message={search ? 'Try another chapter or subject.' : 'Speak with Milo sessions teachers set will show up here.'}
+        />
       ) : null}
 
       {state.status === 'success' && state.data.items.length > 0 ? (

@@ -5,9 +5,11 @@ import type { GridColDef } from '@mui/x-data-grid';
 import { DataTable } from '@/components/DataTable';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { getCurriculum, listSchoolQuestionPapers, listTeachers } from '@/lib/api';
+import { SearchBox } from '@/components/SearchBox';
 import { useAsyncData } from '@/lib/useAsyncData';
 import { useUrlPaginationModel, useUrlParam } from '@/lib/useUrlState';
 import { subjectLabel, type QuestionPaperStatus, type SchoolQuestionPaper } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 const PAGE_SIZE = 20;
 
@@ -26,7 +28,7 @@ const columns: GridColDef<SchoolQuestionPaper>[] = [
     field: 'status',
     headerName: 'Status',
     width: 160,
-    renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{params.row.status}</span>,
+    renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{statusLabel(params.row.status)}</span>,
   },
   {
     field: 'createdAt',
@@ -39,6 +41,7 @@ const columns: GridColDef<SchoolQuestionPaper>[] = [
 export default function SchoolQuestionPapersPage() {
   const [subjectFilter, setSubjectFilter] = useUrlParam('subjectId', '');
   const [createdByFilter, setCreatedByFilter] = useUrlParam('createdBy', '');
+  const [search, setSearch] = useUrlParam('q', '');
   const [paginationModel, setPaginationModel] = useUrlPaginationModel(PAGE_SIZE);
   const curriculumState = useAsyncData('curriculum', () => getCurriculum());
   const teachersState = useAsyncData('teachers', () => listTeachers());
@@ -46,6 +49,7 @@ export default function SchoolQuestionPapersPage() {
     `question-papers:${subjectFilter}:${createdByFilter}:${paginationModel.page}:${paginationModel.pageSize}`,
     () =>
       listSchoolQuestionPapers({
+        q: search || undefined,
         subjectId: subjectFilter || undefined,
         createdBy: createdByFilter || undefined,
         limit: paginationModel.pageSize,
@@ -69,6 +73,14 @@ export default function SchoolQuestionPapersPage() {
       </div>
 
       <div className="table-toolbar">
+        <SearchBox
+          value={search}
+          onChange={(next) => {
+            setSearch(next);
+            setPaginationModel({ page: 0, pageSize: PAGE_SIZE });
+          }}
+          placeholder="Search by paper or subject"
+        />
         <select
           className="field"
           style={{ maxWidth: 240 }}

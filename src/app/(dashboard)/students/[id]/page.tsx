@@ -9,6 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { listClasses, listSchoolHomework, listStudents } from '@/lib/api';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { SchoolHomework } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 const PAGE_SIZE = 10;
 
@@ -25,7 +26,7 @@ const homeworkColumns: GridColDef<SchoolHomework>[] = [
     field: 'status',
     headerName: 'Status',
     width: 140,
-    renderCell: (params) => <span className="tag yellow">{params.row.status}</span>,
+    renderCell: (params) => <span className="tag yellow">{statusLabel(params.row.status)}</span>,
   },
   { field: 'assignedCount', headerName: 'Assigned', width: 100 },
   { field: 'completedCount', headerName: 'Completed', width: 110 },

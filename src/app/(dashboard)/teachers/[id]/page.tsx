@@ -9,6 +9,7 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { listClasses, listSchoolQuestionPapers, listSchoolVoiceTests, listTeachers } from '@/lib/api';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { SchoolQuestionPaper, SchoolVoiceTest } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 const PAGE_SIZE = 10;
 
@@ -19,7 +20,7 @@ const testColumns: GridColDef<SchoolVoiceTest>[] = [
     field: 'status',
     headerName: 'Status',
     width: 140,
-    renderCell: (params) => <span className="tag yellow">{params.row.status}</span>,
+    renderCell: (params) => <span className="tag yellow">{statusLabel(params.row.status)}</span>,
   },
   { field: 'assignedCount', headerName: 'Assigned', width: 100 },
   { field: 'completedCount', headerName: 'Completed', width: 110 },
@@ -39,7 +40,7 @@ const paperColumns: GridColDef<SchoolQuestionPaper>[] = [
     field: 'status',
     headerName: 'Status',
     width: 140,
-    renderCell: (params) => <span className="tag yellow">{params.row.status}</span>,
+    renderCell: (params) => <span className="tag yellow">{statusLabel(params.row.status)}</span>,
   },
   {
     field: 'createdAt',
@@ -137,7 +138,7 @@ export default function TeacherDetailPage() {
         </div>
       </div>
 
-      <h2 style={{ marginBottom: 12 }}>Voice Tests created</h2>
+      <h2 style={{ marginBottom: 12 }}>Speak with Milo sessions set</h2>
       {testsState.status === 'loading' ? <LoadingState label="Loading tests" /> : null}
       {testsState.status === 'error' ? <ErrorState error={testsState.error} onRetry={testsState.retry} /> : null}
       {testsState.status === 'success' && testsState.data.items.length === 0 ? (

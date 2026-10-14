@@ -26,6 +26,7 @@ import type {
   SchoolDataset,
   GradeSubjects,
   SchoolGrade,
+  SchoolChallenge,
   SchoolHomework,
   Chapter,
   CreateSchoolDatasetInput,
@@ -195,6 +196,7 @@ export const listDatasetQuestions = (
     subtopicId?: string;
     bloomLevel?: BloomLevel;
     difficulty?: Difficulty;
+    q?: string;
     limit: number;
     offset: number;
   },
@@ -259,6 +261,7 @@ export const updateSchoolLogo = (logoDataUri: string | null): Promise<SchoolLogo
 export const listSchoolVoiceTests = (params: {
   classId?: string;
   teacherId?: string;
+  q?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolVoiceTest>> =>
@@ -266,6 +269,7 @@ export const listSchoolVoiceTests = (params: {
 
 export const listSchoolHomework = (params: {
   classId?: string;
+  q?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolHomework>> => apiRequest(`/school/homework${toQuery(params)}`);
@@ -273,13 +277,24 @@ export const listSchoolHomework = (params: {
 export const listSchoolQuestionPapers = (params: {
   subjectId?: string;
   createdBy?: string;
+  q?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolQuestionPaper>> =>
   apiRequest(`/school/question-papers${toQuery(params)}`);
 
+/** Teachers' Maths challenges (Fix Milo's homework), school-wide. */
+export const listSchoolChallenges = (params: {
+  classId?: string;
+  teacherId?: string;
+  q?: string;
+  limit: number;
+  offset: number;
+}): Promise<PageEnvelope<SchoolChallenge>> => apiRequest(`/school/challenges${toQuery(params)}`);
+
 export const getSchoolLeaderboard = (params: {
   classId?: string;
+  q?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolLeaderboardEntry>> => apiRequest(`/school/leaderboard${toQuery(params)}`);
@@ -310,6 +325,7 @@ export const listSubtopics = (topicId: string): Promise<Subtopic[]> =>
   apiRequestList(`/topics/${topicId}/subtopics`);
 
 export const listSchoolAuditLog = (params: {
+  q?: string;
   limit: number;
   offset: number;
 }): Promise<PageEnvelope<SchoolAuditLogEntry>> => apiRequest(`/school/audit-log${toQuery(params)}`);

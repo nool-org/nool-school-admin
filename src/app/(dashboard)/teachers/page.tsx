@@ -30,6 +30,7 @@ import { runBulk } from '@/lib/bulk';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { SchoolTeacher, UserStatus } from '@/lib/types';
+import { statusLabel } from '@/lib/statusLabel';
 
 function statusTagVariant(status: UserStatus): string {
   if (status === 'ACTIVE') return 'green';
@@ -270,7 +271,7 @@ export default function TeachersPage() {
       field: 'status',
       headerName: 'Status',
       width: 130,
-      renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{params.row.status}</span>,
+      renderCell: (params) => <span className={`tag ${statusTagVariant(params.row.status)}`}>{statusLabel(params.row.status)}</span>,
     },
     {
       field: 'actions',
