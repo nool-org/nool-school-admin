@@ -8,7 +8,8 @@ import { useToast } from '@/components/Toast';
 import { getSubscription, requestSubscriptionUpgrade } from '@/lib/api';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
-import type { SubscriptionStatus } from '@/lib/types';
+import { FEATURE_LABELS, type Feature, type SubscriptionStatus } from '@/lib/types';
+import { useAuth } from '@/lib/useAuth';
 
 function statusTagVariant(status: SubscriptionStatus): string {
   if (status === 'ACTIVE') return 'green';
@@ -46,6 +47,9 @@ function UsageMeter({
 
 export default function SubscriptionPage() {
   const state = useAsyncData('subscription', () => getSubscription());
+  const enabled = useAuth().profile?.enabledFeatures ?? null;
+  // in the app's order; null = no restriction
+  const included: Feature[] | null = enabled && (Object.keys(FEATURE_LABELS) as Feature[]).filter((f) => enabled.includes(f));
   const { show } = useToast();
 
   const [upgradeOpen, setUpgradeOpen] = useState(false);
@@ -96,6 +100,12 @@ export default function SubscriptionPage() {
             <div className="checkrow">
               <span style={{ color: 'var(--color-muted)' }}>Plan</span>
               <span style={{ marginLeft: 'auto', fontWeight: 600 }}>{state.data.planName}</span>
+            </div>
+            <div className="checkrow" style={{ alignItems: 'flex-start' }}>
+              <span style={{ color: 'var(--color-muted)' }}>Includes</span>
+              <span style={{ marginLeft: 'auto', textAlign: 'right', fontWeight: 600 }}>
+                {included === null ? 'Everything' : included.map((f) => FEATURE_LABELS[f]).join(', ')}
+              </span>
             </div>
             <div className="checkrow">
               <span style={{ color: 'var(--color-muted)' }}>Status</span>

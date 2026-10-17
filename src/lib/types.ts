@@ -9,7 +9,27 @@ export type BloomLevel = 'REMEMBER' | 'UNDERSTAND' | 'APPLY' | 'ANALYZE' | 'EVAL
  * Plans page) - mirrors nool-core's Feature enum exactly. `null` on
  * Profile.enabledFeatures means every feature is enabled (no restriction),
  * same convention as the plan-level field it's derived from. */
-export type Feature = 'question_paper' | 'voice_test' | 'homework' | 'assistant' | 'leaderboard' | 'improvement_analysis';
+export type Feature =
+  | 'question_paper'
+  | 'voice_test'
+  | 'homework'
+  | 'assistant'
+  | 'leaderboard'
+  | 'improvement_analysis'
+  | 'daily_practice'
+  | 'spoken_answers';
+
+/** The names the app shows teachers and students - same as nool-pm-dashboard's. */
+export const FEATURE_LABELS: Record<Feature, string> = {
+  voice_test: 'Speak with Milo + Growth check',
+  homework: "Fix Milo's homework",
+  daily_practice: 'Daily practice',
+  spoken_answers: 'Spoken answers (in daily practice)',
+  question_paper: 'Question papers',
+  assistant: 'Teacher assistant',
+  leaderboard: 'Leaderboard',
+  improvement_analysis: 'Progress',
+};
 
 export const BLOOM_LEVELS: readonly BloomLevel[] = [
   'REMEMBER',
