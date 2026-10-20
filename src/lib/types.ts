@@ -505,6 +505,8 @@ export interface SchoolSubscription {
   schoolId: string;
   planId: string;
   planName: string;
+  priceLabel: string;
+  discountPercent: number;
   status: SubscriptionStatus;
   renewsAt: string;
   teacherCount: number;

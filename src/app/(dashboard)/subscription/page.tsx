@@ -101,6 +101,13 @@ export default function SubscriptionPage() {
               <span style={{ color: 'var(--color-muted)' }}>Plan</span>
               <span style={{ marginLeft: 'auto', fontWeight: 600 }}>{state.data.planName}</span>
             </div>
+            <div className="checkrow">
+              <span style={{ color: 'var(--color-muted)' }}>Price</span>
+              <span style={{ marginLeft: 'auto', textAlign: 'right', fontWeight: 600 }}>
+                {state.data.priceLabel} + GST
+                {state.data.discountPercent > 0 ? ` (${state.data.discountPercent}% off)` : ''}
+              </span>
+            </div>
             <div className="checkrow" style={{ alignItems: 'flex-start' }}>
               <span style={{ color: 'var(--color-muted)' }}>Includes</span>
               <span style={{ marginLeft: 'auto', textAlign: 'right', fontWeight: 600 }}>
