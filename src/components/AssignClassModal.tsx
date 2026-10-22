@@ -6,12 +6,25 @@ import { Modal } from './Modal';
 import { getGradeSubjects, listSubjects } from '@/lib/api';
 import { normalizeError } from '@/lib/errors';
 import { useAsyncData } from '@/lib/useAsyncData';
-import { subjectLabel, type ClassAssignment, type SchoolAdminClass, type SchoolTeacher } from '@/lib/types';
+import {
+  subjectLabel,
+  type ClassAssignment,
+  type SchoolAdminClass,
+  type SchoolTeacher,
+  type ScienceBranch,
+} from '@/lib/types';
 
 interface Row {
   teacherId: string;
   subjectId: string;
+  branch: ScienceBranch | null;
 }
+
+const BRANCHES: { value: ScienceBranch; label: string }[] = [
+  { value: 'PHYSICS', label: 'Physics chapters' },
+  { value: 'CHEMISTRY', label: 'Chemistry chapters' },
+  { value: 'BIOLOGY', label: 'Biology chapters' },
+];
 
 /**
  * Backs the literal "assign a class to teacher" ask (PUT
@@ -52,7 +65,13 @@ export function AssignClassModal({
   useEffect(() => {
     if (schoolClass) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- seeding local editable rows from the class prop whenever a different class is opened is the intended behavior, not a render-derived value.
-      setRows(schoolClass.assignments.map((a) => ({ teacherId: a.teacherId, subjectId: a.subjectId })));
+      setRows(
+        schoolClass.assignments.map((a) => ({
+          teacherId: a.teacherId,
+          subjectId: a.subjectId,
+          branch: a.branch ?? null,
+        })),
+      );
       setFormError(null);
     }
   }, [schoolClass]);
@@ -87,7 +106,7 @@ export function AssignClassModal({
 
   function addRow() {
     // Start empty - the admin must pick both explicitly.
-    setRows((current) => [...current, { teacherId: '', subjectId: '' }]);
+    setRows((current) => [...current, { teacherId: '', subjectId: '', branch: null }]);
   }
 
   async function handleSave() {
@@ -159,7 +178,7 @@ export function AssignClassModal({
                   <select
                     className="field"
                     value={row.subjectId}
-                    onChange={(e) => updateRow(index, { subjectId: e.target.value })}
+                    onChange={(e) => updateRow(index, { subjectId: e.target.value, branch: null })}
                   >
                     <option value="" disabled>
                       Select subject
@@ -170,6 +189,24 @@ export function AssignClassModal({
                       </option>
                     ))}
                   </select>
+                  {/* Science can be split between up to 3 teachers, one branch each */}
+                  {subjects.find((s) => s.id === row.subjectId)?.name === 'Science' ? (
+                    <select
+                      className="field"
+                      aria-label="Chapters"
+                      value={row.branch ?? ''}
+                      onChange={(e) =>
+                        updateRow(index, { branch: (e.target.value || null) as ScienceBranch | null })
+                      }
+                    >
+                      <option value="">All chapters</option>
+                      {BRANCHES.map((b) => (
+                        <option key={b.value} value={b.value}>
+                          {b.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
                 </>
               )}
               <button type="button" className="remove-row-btn" aria-label="Remove" onClick={() => removeRow(index)}>

@@ -146,9 +146,13 @@ export interface BulkImportResult {
   errorCount: number;
 }
 
+export type ScienceBranch = 'PHYSICS' | 'CHEMISTRY' | 'BIOLOGY';
+
 export interface ClassAssignment {
   teacherId: string;
   subjectId: string;
+  /** Science shared by up to 3 teachers: this teacher's branch (null = every chapter). */
+  branch?: ScienceBranch | null;
 }
 
 export interface SchoolAdminClass {
