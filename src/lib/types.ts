@@ -17,12 +17,20 @@ export type Feature =
   | 'leaderboard'
   | 'improvement_analysis'
   | 'daily_practice'
-  | 'spoken_answers';
+  | 'spoken_answers'
+  | 'topic_quiz'
+  | 'growth_check'
+  | 'class_tests'
+  | 'revision_cards';
 
 /** The names the app shows teachers and students - same as nool-pm-dashboard's. */
 export const FEATURE_LABELS: Record<Feature, string> = {
-  voice_test: 'Speak with Milo + Growth check',
-  homework: "Fix Milo's homework",
+  voice_test: 'Speak with Milo',
+  growth_check: 'Growth check (after Speak with Milo)',
+  topic_quiz: 'Topic checkpoints + re-check',
+  class_tests: "Written tests + Fix Milo's homework challenges",
+  homework: 'Homework',
+  revision_cards: 'Revision cards',
   daily_practice: 'Daily practice',
   spoken_answers: 'Spoken answers (in daily practice)',
   question_paper: 'Question papers',
