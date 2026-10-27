@@ -24,6 +24,9 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === 'authenticated') {
       router.replace(profile?.mustChangePassword ? '/change-password' : '/dashboard');
+    } else if (status === 'wrongRole') {
+      // the dashboard layout explains it, instead of the form sitting there silently
+      router.replace('/dashboard');
     }
   }, [status, profile, router]);
 

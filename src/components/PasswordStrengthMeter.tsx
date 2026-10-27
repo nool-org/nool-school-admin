@@ -7,7 +7,7 @@ const STRENGTH_COLOR: Record<string, string> = {
   weak: 'var(--color-red)',
   fair: '#d97706',
   good: '#2563eb',
-  strong: 'var(--color-green, #276b35)',
+  strong: 'var(--color-green, #5e7d57)',
 };
 
 const STRENGTH_LABEL: Record<string, string> = {

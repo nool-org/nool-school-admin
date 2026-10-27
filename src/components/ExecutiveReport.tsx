@@ -38,7 +38,7 @@ const BLOOM_LABEL: Record<string, string> = {
 // read as distinct at a glance - pulled from globals.css's existing
 // palette (yellow/purple/green/red/amber) plus one added blue, rather than
 // inventing an unrelated chart-only palette.
-const CHART_COLORS = ['#ffc800', '#6840ae', '#276b35', '#b24c4c', '#886a00', '#2f6690'];
+const CHART_COLORS = ['#ffc800', '#2b2b30', '#5e7d57', '#9c4429', '#c99a3a', '#56708a'];
 
 function CardShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (

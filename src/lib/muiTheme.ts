@@ -8,27 +8,27 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
  * selected DataGrid rows) so every MUI component reads as the same
  * two-tone brand as the plain-CSS pages, not a bolted-on default blue.
  */
-const black = '#0B0B0B';
-const ink2 = '#24231F';
-const muted = '#77746B';
-const line = '#E6E3D9';
-const lineSoft = '#F1EFE7';
-const bg = '#F7F6F1';
+const black = '#2B2B30';
+const ink2 = '#374151';
+const muted = '#5B6475';
+const line = '#E2DBD0';
+const lineSoft = '#EEEAE3';
+const bg = '#F6EFE4';
 const yellow = '#FFC800';
-const yellowSoft = '#FFF4C7';
-const yellowWash = '#FFFAE0';
+const yellowSoft = '#F4EAD2';
+const yellowWash = '#FBF7F0';
 
 export const muiTheme = createTheme({
   palette: {
     primary: { main: black, contrastText: '#fff' },
     warning: { main: yellow, dark: '#E6B400', light: yellowSoft, contrastText: black },
-    error: { main: '#B24C4C' },
-    success: { main: '#276B35' },
+    error: { main: '#9C4429' },
+    success: { main: '#5E7D57' },
     background: { default: bg, paper: '#FFFFFF' },
-    text: { primary: '#171713', secondary: muted },
+    text: { primary: '#1F2937', secondary: muted },
   },
   typography: {
-    fontFamily: 'var(--font-nunito), var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
+    fontFamily: 'var(--font-brand), var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
   },
   shape: {
     borderRadius: 10,
@@ -45,7 +45,7 @@ export const muiTheme = createTheme({
           // "premium admin table" signature this had been missing.
           '& .MuiDataGrid-columnHeaders': {
             backgroundColor: bg,
-            borderBottom: `2px solid ${black}`,
+            borderBottom: `1px solid ${line}`,
           },
           '& .MuiDataGrid-columnHeader': {
             padding: '0 20px',
@@ -95,7 +95,7 @@ export const muiTheme = createTheme({
             backgroundColor: yellowSoft,
           },
           '& .MuiDataGrid-row.Mui-selected:hover': {
-            backgroundColor: '#FFEDA8',
+            backgroundColor: '#EFE3C4',
           },
           '& .MuiCheckbox-root': {
             color: '#D9D5C7',
